@@ -1,445 +1,1160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MimiFood | Smart Campus Ordering</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #FF4757;
-            --primary-dark: #E84118;
-            --secondary: #2F3542;
-            --accent: #FFA502;
-            --bg: #F8F9FB;
-            --card: #FFFFFF;
-            --text: #2F3542;
-            --muted: #A4B0BE;
-            --success: #2ED573;
-            --radius-xl: 30px;
-            --radius-lg: 20px;
-            --shadow: 0 10px 25px rgba(0,0,0,0.05);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MimiFood | Smart Campus Ordering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #FF4757;
+      --primary-dark: #cc2f3e;
+      --accent: #FFA502;
+      --purple: #7C5CBF;
+      --bg: #F4F5F7;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #9CA3AF;
+      --border: rgba(0,0,0,0.06);
+      --success: #10B981;
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.10);
+      --shadow-lg: 0 20px 50px rgba(0,0,0,0.18);
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #1e1e1e; /* Background for desktop view */
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #111827;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
 
-        /* Mobile Container Emulator */
-        .phone-container {
-            width: 100%;
-            max-width: 414px;
-            height: 896px;
-            background: var(--bg);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            border-radius: 40px; /* Simulated phone curves */
-        }
+    /* ── Phone Shell ── */
+    .phone {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      border-radius: 48px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg), inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
 
-        /* Global Header */
-        header {
-            padding: 20px 24px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
+    /* Notch */
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 30px;
+      background: #111827;
+      border-radius: 0 0 20px 20px;
+      z-index: 100;
+    }
 
-        .brand { font-weight: 800; font-size: 1.5rem; color: var(--primary); letter-spacing: -0.5px; }
-        .notif-btn { width: 45px; height: 45px; border-radius: 15px; background: white; display: grid; place-items: center; box-shadow: var(--shadow); border: none; cursor: pointer; }
+    /* ── Status Bar ── */
+    .status-bar {
+      height: 44px;
+      padding: 14px 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .status-right { display: flex; gap: 6px; align-items: center; }
+    .status-right span { font-size: 0.65rem; }
 
-        /* Navigation Content */
-        main { flex: 1; overflow-y: auto; padding-bottom: 100px; scroll-behavior: smooth; position: relative; }
-        
-        .screen {
-            display: none;
-            padding: 0 20px;
-            animation: slideIn 0.4s ease forwards;
-        }
-        .screen.active { display: block; }
+    /* ── Header ── */
+    header {
+      padding: 10px 22px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      background: var(--bg);
+      position: relative;
+      z-index: 10;
+    }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
+    .brand {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--primary);
+      letter-spacing: -1px;
+    }
+    .brand span { color: var(--text); }
 
-        /* Reusable Components */
-        .search-container {
-            margin: 15px 0;
-            background: #EDF0F5;
-            padding: 12px 18px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--muted);
-        }
+    .header-right { display: flex; gap: 10px; align-items: center; }
 
-        .hero-banner {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            color: white;
-            margin-bottom: 25px;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-banner h1 { margin: 0; font-size: 1.2rem; font-weight: 700; line-height: 1.4; }
-        .hero-banner p { margin: 8px 0 15px; opacity: 0.9; font-size: 0.85rem; }
+    .icon-btn {
+      width: 40px; height: 40px;
+      border-radius: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+    }
+    .icon-btn:active { transform: scale(0.92); }
 
-        .chip-row { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 20px; scrollbar-width: none; }
-        .chip-row::-webkit-scrollbar { display: none; }
-        .chip { 
-            padding: 8px 18px; background: white; border-radius: 20px; 
-            font-size: 0.85rem; white-space: nowrap; border: 1px solid #eee;
-            cursor: pointer; transition: var(--transition);
-        }
-        .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+    /* ── Main Scroll Area — hidden scrollbar ── */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-bottom: 88px;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    main::-webkit-scrollbar { display: none; }
 
-        .section-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .section-title span { font-size: 0.8rem; color: var(--primary); }
+    /* ── Screens ── */
+    .screen {
+      display: none;
+      padding: 0 18px;
+      animation: fadeUp 0.35s var(--ease) forwards;
+    }
+    .screen.active { display: block; }
 
-        /* Cards */
-        .card { background: white; border-radius: var(--radius-lg); padding: 15px; margin-bottom: 15px; border: 1px solid #f0f0f0; box-shadow: var(--shadow); }
-        
-        .food-card { display: flex; gap: 15px; align-items: center; cursor: pointer; }
-        .food-img { width: 80px; height: 80px; border-radius: 15px; background: #FFF3F4; display: grid; place-items: center; font-size: 2rem; }
-        .food-info { flex: 1; }
-        .food-info h4 { margin: 0 0 4px; font-size: 1rem; }
-        .food-info p { margin: 0; color: var(--muted); font-size: 0.75rem; }
-        .price-tag { font-weight: 800; color: var(--primary); margin-top: 5px; display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .action-item { background: white; padding: 15px; border-radius: 18px; text-align: center; border: 1px solid #eee; transition: var(--transition); }
-        .action-item:active { transform: scale(0.95); }
-        .action-icon { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+    /* ── Hero Banner ── */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: var(--radius-xl);
+      padding: 22px 20px;
+      color: white;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      bottom: -20px; right: 30px;
+      width: 80px; height: 80px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .hero-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 8px;
+    }
+    .hero h2 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .hero p { font-size: 0.8rem; opacity: 0.85; margin-bottom: 16px; }
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      color: var(--primary);
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s var(--ease);
+    }
+    .hero-btn:active { transform: scale(0.95); }
 
-        /* Timetable UI */
-        .timetable { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-        .slot { display: flex; padding: 12px; background: #fff; border-radius: 12px; border-left: 4px solid var(--primary); justify-content: space-between; align-items: center; }
-        .slot.free { border-left-color: var(--success); background: #f0fff4; }
+    /* ── Search Bar ── */
+    .search-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 11px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      cursor: text;
+    }
+    .search-bar .search-icon { font-size: 1rem; }
 
-        /* Bottom Nav */
-        nav {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 85px;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(20px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 10px 15px;
-            border-top: 1px solid rgba(0,0,0,0.05);
-        }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            color: var(--muted);
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 1.4rem; font-style: normal; }
+    /* ── Chip Row ── */
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0 14px;
+      scrollbar-width: none;
+    }
+    .chip-row::-webkit-scrollbar { display: none; }
 
-        /* Tracking UI */
-        .status-bar { height: 6px; background: #eee; border-radius: 3px; margin: 15px 0; overflow: hidden; }
-        .status-progress { width: 65%; height: 100%; background: var(--primary); border-radius: 3px; }
+    .chip {
+      padding: 7px 16px;
+      background: var(--card);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      color: var(--text);
+    }
+    .chip.active {
+      background: var(--text);
+      color: white;
+      border-color: var(--text);
+    }
 
-        /* Dark Mode Override */
-        .dark-mode { --bg: #121212; --card: #1E1E1E; --text: #F8F9FB; --shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .dark-mode .phone-container { background: var(--bg); }
-        .dark-mode .card, .dark-mode .action-item, .dark-mode .notif-btn, .dark-mode .chip { background: #1E1E1E; border-color: #333; }
-        .dark-mode .search-container { background: #2A2A2A; }
-    </style>
+    /* ── Section Title ── */
+    .section-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-title .see-all {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      padding: 15px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Food Card */
+    .food-card {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.15s var(--ease);
+    }
+    .food-card:active { transform: scale(0.98); }
+
+    .food-emoji {
+      width: 72px; height: 72px;
+      border-radius: 16px;
+      background: #FFF3F4;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .food-details { flex: 1; min-width: 0; }
+    .food-details h4 { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .food-details .meta { font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+
+    .food-footer { display: flex; justify-content: space-between; align-items: center; }
+    .price { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+    .badge-green { background: #D1FAE5; color: #065F46; }
+    .badge-orange { background: #FEF3C7; color: #92400E; }
+    .badge-red { background: #FEE2E2; color: #991B1B; }
+
+    /* Add button */
+    .add-btn {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.15s var(--ease);
+      flex-shrink: 0;
+    }
+    .add-btn:active { transform: scale(0.9); }
+
+    /* ── Action Grid ── */
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .action-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 14px;
+      cursor: pointer;
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+      box-shadow: var(--shadow-sm);
+    }
+    .action-card:active { transform: scale(0.95); box-shadow: none; }
+    .action-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
+    .action-card b { font-size: 0.82rem; font-weight: 700; display: block; }
+    .action-card small { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── Progress / Status Bar ── */
+    .progress-wrap { height: 5px; background: #E5E7EB; border-radius: 99px; overflow: hidden; margin: 12px 0; }
+    .progress-fill { height: 100%; border-radius: 99px; background: var(--primary); }
+
+    /* ── Timetable Slots ── */
+    .slot {
+      background: var(--card);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-left: 4px solid #E5E7EB;
+      box-shadow: var(--shadow-sm);
+    }
+    .slot.busy { border-left-color: var(--muted); }
+    .slot.free-gap { border-left-color: var(--success); background: #F0FDF4; }
+    .slot b { font-size: 0.85rem; display: block; }
+    .slot small { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── Map Placeholder ── */
+    .map-canvas {
+      background: #E5E7EB;
+      border-radius: var(--radius-lg);
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .map-canvas .map-bg {
+      width: 100%; height: 100%;
+      background:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+        #D1D5DB;
+      background-size: 30px 30px;
+    }
+    .map-pin {
+      position: absolute;
+      font-size: 1.6rem;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+    }
+    .map-label {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* ── AI Banner ── */
+    .ai-hero {
+      background: linear-gradient(135deg, #5b21b6, var(--purple));
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      color: white;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-hero::after {
+      content: '🤖';
+      position: absolute;
+      right: 16px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 3.5rem;
+      opacity: 0.25;
+    }
+    .ai-hero .hero-label { opacity: 0.7; }
+    .ai-hero h2 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.2rem; }
+    .ai-hero p { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; }
+
+    /* Queue Meter */
+    .queue-bar-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .queue-row { display: flex; align-items: center; gap: 10px; }
+    .queue-row span:first-child { font-size: 0.78rem; font-weight: 600; width: 90px; flex-shrink: 0; color: var(--text); }
+    .queue-track { flex: 1; height: 8px; background: #F3F4F6; border-radius: 99px; overflow: hidden; }
+    .queue-fill { height: 100%; border-radius: 99px; }
+    .queue-row .queue-time { font-size: 0.7rem; font-weight: 700; color: var(--muted); flex-shrink: 0; width: 32px; text-align: right; }
+
+    /* ── Profile ── */
+    .profile-avatar {
+      width: 80px; height: 80px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: grid;
+      place-items: center;
+      font-size: 2.2rem;
+      margin: 0 auto 10px;
+    }
+    .profile-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.15rem; text-align: center; }
+    .profile-sub { text-align: center; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
+    .profile-badge-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; margin-top: 8px; }
+
+    .menu-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .menu-row-icon { font-size: 1.3rem; width: 36px; height: 36px; background: #F3F4F6; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+    .menu-row-label { flex: 1; font-weight: 600; font-size: 0.88rem; }
+    .menu-row-arrow { color: var(--muted); font-size: 0.85rem; }
+
+    .divider { height: 1px; background: var(--border); margin: 10px 0; }
+
+    /* ── Bottom Nav ── */
+    nav {
+      position: absolute;
+      bottom: 0; width: 100%;
+      height: 80px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 6px 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      z-index: 50;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      transition: color 0.2s var(--ease);
+      padding: 6px 14px;
+      border-radius: 14px;
+      position: relative;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 20px; height: 3px;
+      background: var(--primary);
+      border-radius: 0 0 3px 3px;
+    }
+    .nav-icon { font-size: 1.35rem; line-height: 1; }
+
+    /* ── Toast ── */
+    .toast {
+      position: absolute;
+      top: -120px;
+      left: 16px; right: 16px;
+      background: var(--text);
+      color: white;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      z-index: 200;
+      transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .toast.show { top: 52px; }
+    .toast-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .toast-body { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 2px; }
+    .toast-msg { font-size: 0.75rem; opacity: 0.75; line-height: 1.4; }
+
+    /* ── Live Tracking Steps ── */
+    .track-steps { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 12px; }
+    .track-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+    .track-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #E5E7EB;
+      display: grid; place-items: center;
+      font-size: 0.8rem;
+    }
+    .track-dot.done { background: var(--primary); }
+    .track-dot.active-step { background: var(--primary); box-shadow: 0 0 0 4px rgba(255,71,87,0.2); }
+    .track-line { height: 2px; flex: 1; background: #E5E7EB; margin-top: 14px; }
+    .track-line.done { background: var(--primary); }
+    .track-label { font-size: 0.62rem; font-weight: 600; color: var(--muted); text-align: center; }
+    .track-label.done, .track-label.active-step { color: var(--primary); }
+
+    .rider-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .rider-avatar {
+      width: 46px; height: 46px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #60A5FA, #3B82F6);
+      display: grid; place-items: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .rider-info b { font-size: 0.88rem; display: block; }
+    .rider-info small { font-size: 0.75rem; color: var(--muted); }
+    .eta-pill {
+      margin-left: auto;
+      background: #FEF3C7;
+      color: #92400E;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    /* ── Dark Mode ── */
+    .dark-mode {
+      --bg: #0F172A;
+      --card: #1E293B;
+      --text: #F1F5F9;
+      --muted: #64748B;
+      --border: rgba(255,255,255,0.06);
+    }
+    .dark-mode body { background: #060d1a; }
+    .dark-mode .chip { background: #1E293B; color: #F1F5F9; }
+    .dark-mode .search-bar { background: #1E293B; }
+    .dark-mode .map-canvas .map-bg { background: #1E293B; }
+    .dark-mode .slot { background: #1E293B; }
+    .dark-mode .slot.free-gap { background: #0D2A1C; }
+    .dark-mode nav { background: rgba(15,23,42,0.92); }
+    .dark-mode .action-card { background: #1E293B; }
+    .dark-mode .queue-track { background: #334155; }
+    .dark-mode .track-line { background: #334155; }
+    .dark-mode .track-dot { background: #334155; }
+    .dark-mode .menu-row-icon { background: #334155; }
+  </style>
 </head>
 <body>
 
-    <div class="phone-container" id="app">
-        <header>
-            <div class="brand">MimiFood</div>
-            <button class="notif-btn" onclick="showNotif()">🔔</button>
-        </header>
+<div class="phone" id="app">
 
-        <main id="main-scroll">
-            
-            <section id="home" class="screen active">
-                <div class="hero-banner">
-                    <h1>Hi, hungry? <br>Here's your best option 🍽️</h1>
-                    <p>Based on your 15-min walk and 12:00 break.</p>
-                    <button class="chip active" onclick="navigate('menu')">Order Now</button>
-                </div>
-
-                <div class="search-container">🔍 Search stalls, food...</div>
-
-                <div class="chip-row">
-                    <div class="chip active">Cheap</div>
-                    <div class="chip">Popular</div>
-                    <div class="chip">Nearby</div>
-                    <div class="chip">Open Now</div>
-                </div>
-
-                <div class="section-title">Quick Actions</div>
-                <div class="action-grid">
-                    <div class="action-item" onclick="navigate('menu')">
-                        <span class="action-icon">🔁</span>
-                        <b>Order Again</b>
-                    </div>
-                    <div class="action-item" onclick="navigate('ai')">
-                        <span class="action-icon">🤖</span>
-                        <b>AI Picks</b>
-                    </div>
-                    <div class="action-item" onclick="navigate('timetable')">
-                        <span class="action-icon">📅</span>
-                        <b>Quick Lunch</b>
-                    </div>
-                    <div class="action-item" onclick="toggleDarkMode()">
-                        <span class="action-icon">🌙</span>
-                        <b>Night Mode</b>
-                    </div>
-                </div>
-
-                <div class="section-title">Suggested Nearby <span>See Map</span></div>
-                <div class="card food-card" onclick="openFood('Ayam Penyet Set', 'RM 7.50', '🍗')">
-                    <div class="food-img">🍗</div>
-                    <div class="food-info">
-                        <h4>Ayam Penyet Set</h4>
-                        <p>Kolej Stall • 12 min queue</p>
-                        <span class="price-tag">RM 7.50</span>
-                    </div>
-                </div>
-            </section>
-
-            <section id="map" class="screen">
-                <div class="section-title">Campus Food Map</div>
-                <div class="chip-row">
-                    <div class="chip active">Kolej</div>
-                    <div class="chip">Fakulti</div>
-                    <div class="chip">Library</div>
-                    <div class="chip">Safe Zones</div>
-                </div>
-                <div class="card" style="height: 300px; background: #e0e0e0; display: grid; place-items: center; position: relative;">
-                    <div style="text-align: center; color: #666;">
-                        📍 Interactive Map Loading...<br>
-                        <small>(Simulated UI)</small>
-                    </div>
-                    <div style="position: absolute; top: 20%; left: 30%; font-size: 2rem;">🏪</div>
-                    <div style="position: absolute; bottom: 30%; right: 40%; font-size: 2rem;">🍜</div>
-                </div>
-                <div class="section-title" style="margin-top: 20px;">Stalls in your area</div>
-                <div class="card food-card">
-                    <div class="food-img">🍜</div>
-                    <div class="food-info">
-                        <h4>Fakulti Noodles</h4>
-                        <p>Open Now • 50m away</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="ai" class="screen">
-                <div class="hero-banner" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
-                    <h1>AI Smart Picks 🤖</h1>
-                    <p>Personalized based on your Friday pattern.</p>
-                </div>
-                <div class="section-title">Personalized Suggestions</div>
-                <div class="card" style="border-left: 5px solid var(--accent);">
-                    <div style="font-weight: 700; margin-bottom: 5px;">"The Usual"</div>
-                    <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Nasi Goreng + Iced Tea</p>
-                    <button class="chip active" style="margin-top: 10px; width: 100%;">Order Now (RM 6.00)</button>
-                </div>
-                <div class="section-title">Queue Prediction</div>
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>Central Kiosk</span>
-                        <span style="color: var(--primary);">High Traffic (25m)</span>
-                    </div>
-                    <div class="status-bar"><div class="status-progress" style="width: 90%; background: var(--primary);"></div></div>
-                    <p style="margin: 0; font-size: 0.75rem; color: var(--muted);">Try "Library Corner" for a 5-min wait instead.</p>
-                </div>
-            </section>
-
-            <section id="timetable" class="screen">
-                <div class="section-title">Your Timetable</div>
-                <div class="timetable">
-                    <div class="slot">
-                        <div><b>08:00 - 10:00</b><br><small>Biology Lecture</small></div>
-                        <span style="opacity: 0.5;">Class</span>
-                    </div>
-                    <div class="slot free">
-                        <div><b>10:00 - 11:00</b><br><small>Free Gap Detected</small></div>
-                        <button class="chip active" onclick="navigate('menu')">Order Now</button>
-                    </div>
-                    <div class="slot">
-                        <div><b>11:00 - 13:00</b><br><small>Chemistry Lab</small></div>
-                        <span style="opacity: 0.5;">Class</span>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>Pre-order for later?</h4>
-                    <p style="font-size: 0.8rem; color: var(--muted);">AI suggests ordering at 10:45 AM to receive it right after Lab.</p>
-                    <input type="time" class="chip" style="width: 100%; border: 1px solid #ddd; margin-top: 10px;">
-                </div>
-            </section>
-
-            <section id="orders" class="screen">
-                <div class="section-title">Live Tracking</div>
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <b>Order #MF-8829</b><br>
-                            <small>Ayam Penyet Set</small>
-                        </div>
-                        <div class="food-img" style="width: 50px; height: 50px;">🍗</div>
-                    </div>
-                    <div class="status-bar"><div class="status-progress"></div></div>
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
-                        <span>Preparing</span>
-                        <span style="font-weight: 700; color: var(--primary);">On the way</span>
-                        <span style="opacity: 0.3;">Arriving</span>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>Delivery Details</h4>
-                    <p style="margin: 0; font-size: 0.85rem;">📍 <b>Fakulti Pin</b> (Safe Zone A)</p>
-                    <p style="margin: 5px 0 0; font-size: 0.85rem;">🚴 <b>Rider:</b> Amir (5 mins away)</p>
-                </div>
-            </section>
-
-            <section id="menu" class="screen">
-                <div class="section-title">Centralized Menu</div>
-                <div class="search-container">🔍 Search all stalls...</div>
-                <div class="chip-row">
-                    <div class="chip active">All</div>
-                    <div class="chip">Combos</div>
-                    <div class="chip">Drinks</div>
-                    <div class="chip">Quick Set</div>
-                </div>
-                <div class="card food-card" onclick="openFood('Student Combo A', 'RM 8.00', '🍱')">
-                    <div class="food-img">🍱</div>
-                    <div class="food-info">
-                        <h4>Student Combo A</h4>
-                        <p>Chicken Rice + Iced Milo</p>
-                        <span class="price-tag">RM 8.00</span>
-                    </div>
-                </div>
-                <div class="card food-card" onclick="openFood('Cheese Burger', 'RM 6.50', '🍔')">
-                    <div class="food-img">🍔</div>
-                    <div class="food-info">
-                        <h4>Cheese Burger</h4>
-                        <p>Stall C • 15 min wait</p>
-                        <span class="price-tag">RM 6.50</span>
-                    </div>
-                </div>
-            </section>
-
-            <section id="profile" class="screen">
-                <div style="text-align: center; padding: 20px;">
-                    <div style="width: 100px; height: 100px; border-radius: 50%; background: #ddd; margin: 0 auto 10px; display: grid; place-items: center; font-size: 3rem;">👤</div>
-                    <h3>Student User</h3>
-                    <p style="color: var(--muted);">UPM Student • Gold Member</p>
-                </div>
-                <div class="card">❤️ Favorite Meals</div>
-                <div class="card">📜 Order History</div>
-                <div class="card">⚙️ Notification Settings</div>
-            </section>
-
-        </main>
-
-        <nav>
-            <div class="nav-item active" onclick="navigate('home', this)">
-                <i>🏠</i>
-                Home
-            </div>
-            <div class="nav-item" onclick="navigate('map', this)">
-                <i>📍</i>
-                Map
-            </div>
-            <div class="nav-item" onclick="navigate('ai', this)">
-                <i>🤖</i>
-                AI
-            </div>
-            <div class="nav-item" onclick="navigate('orders', this)">
-                <i>📦</i>
-                Orders
-            </div>
-            <div class="nav-item" onclick="navigate('profile', this)">
-                <i>❤️</i>
-                Profile
-            </div>
-        </nav>
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-right">
+      <span>●●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
     </div>
+  </div>
 
-    <div id="toast" style="position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--secondary); color: white; padding: 15px; border-radius: 15px; z-index: 1000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-        <b id="toast-title">Notification</b>
-        <p id="toast-msg" style="margin: 5px 0 0; font-size: 0.8rem;"></p>
+  <!-- Header -->
+  <header>
+    <div class="brand">Mimi<span>Food</span></div>
+    <div class="header-right">
+      <div class="icon-btn" onclick="toggleDark()">🌙</div>
+      <div class="icon-btn" onclick="showToast('You have 2 new alerts', 'Break in 10 mins. Order now to skip the queue! 🍽️', '🔔')">🔔</div>
     </div>
+  </header>
 
-    <script>
-        function navigate(screenId, el) {
-            // Screen Switching
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            // Bottom Nav Styling
-            if (el) {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                el.classList.add('active');
-            } else {
-                // If navigated via button inside screen, update nav bar manually
-                const items = document.querySelectorAll('.nav-item');
-                const map = {home:0, map:1, ai:2, orders:3, profile:4, menu:3, timetable:2};
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                if(items[map[screenId]]) items[map[screenId]].classList.add('active');
-            }
+  <!-- Main Content -->
+  <main id="main-scroll">
 
-            // Scroll main back to top
-            document.getElementById('main-scroll').scrollTop = 0;
-        }
+    <!-- HOME -->
+    <section id="home" class="screen active">
+      <div class="hero">
+        <div class="hero-label">🕐 12:00 break in 10 min</div>
+        <h2>Hi, hungry? Here's<br>your best pick today 🍽️</h2>
+        <p>Based on your 15-min walk & timetable gap.</p>
+        <button class="hero-btn" onclick="navigate('menu')">Order Now →</button>
+      </div>
 
-        function toggleDarkMode() {
-            document.getElementById('app').classList.toggle('dark-mode');
-            showNotif("Mode Switched", "Night Mode activated. Only showing open-now stalls.");
-        }
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <span>Search stalls, food, combos...</span>
+      </div>
 
-        function showNotif(title = "Smart Suggestion", msg = "Your break starts in 10 mins. Order now to skip the queue!") {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-msg').innerText = msg;
-            
-            toast.style.top = "20px";
-            setTimeout(() => {
-                toast.style.top = "-100px";
-            }, 4000);
-        }
+      <div class="chip-row">
+        <div class="chip active">🔥 Trending</div>
+        <div class="chip">💸 Cheap</div>
+        <div class="chip">📍 Nearby</div>
+        <div class="chip">✅ Open Now</div>
+        <div class="chip">⚡ Quick</div>
+      </div>
 
-        function openFood(name, price, emoji) {
-            showNotif("Added to Cart", `${name} (${price}) has been added. Check your orders.`);
-            setTimeout(() => navigate('orders'), 1000);
-        }
+      <div class="section-title">Quick Actions</div>
+      <div class="action-grid">
+        <div class="action-card" onclick="navigate('menu')">
+          <span class="action-icon">🔁</span>
+          <b>Order Again</b>
+          <small>Last: Nasi Goreng</small>
+        </div>
+        <div class="action-card" onclick="navigate('ai')">
+          <span class="action-icon">🤖</span>
+          <b>AI Picks</b>
+          <small>Personalized for you</small>
+        </div>
+        <div class="action-card" onclick="navigate('timetable')">
+          <span class="action-icon">📅</span>
+          <b>My Timetable</b>
+          <small>1 gap detected</small>
+        </div>
+        <div class="action-card" onclick="navigate('map')">
+          <span class="action-icon">📍</span>
+          <b>Campus Map</b>
+          <small>7 stalls open</small>
+        </div>
+      </div>
 
-        // Randomly trigger a smart notification after 3 seconds
-        setTimeout(() => {
-            showNotif("Timetable Gap Detected", "1-hour break coming up! Want to see lunch sets near Fakulti?");
-        }, 3000);
-    </script>
+      <div class="section-title">
+        Suggested for You
+        <span class="see-all" onclick="navigate('menu')">See all</span>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Ayam Penyet Set', 'RM 7.50', '🍗')">
+        <div class="food-emoji">🍗</div>
+        <div class="food-details">
+          <h4>Ayam Penyet Set</h4>
+          <div class="meta">Kolej Stall • 300m away</div>
+          <div class="food-footer">
+            <span class="price">RM 7.50</span>
+            <span class="badge badge-green">12 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Student Combo A', 'RM 8.00', '🍱')">
+        <div class="food-emoji">🍱</div>
+        <div class="food-details">
+          <h4>Student Combo A</h4>
+          <div class="meta">Central Kiosk • 150m away</div>
+          <div class="food-footer">
+            <span class="price">RM 8.00</span>
+            <span class="badge badge-orange">20 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Cheese Burger', 'RM 6.50', '🍔')">
+        <div class="food-emoji">🍔</div>
+        <div class="food-details">
+          <h4>Cheese Burger</h4>
+          <div class="meta">Stall C • 200m away</div>
+          <div class="food-footer">
+            <span class="price">RM 6.50</span>
+            <span class="badge badge-green">8 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section id="map" class="screen">
+      <div class="chip-row">
+        <div class="chip active">All Stalls</div>
+        <div class="chip">Kolej</div>
+        <div class="chip">Fakulti</div>
+        <div class="chip">Library</div>
+        <div class="chip">Safe Zones</div>
+      </div>
+
+      <div class="map-canvas">
+        <div class="map-bg"></div>
+        <div class="map-pin" style="top:30%; left:25%">🏪</div>
+        <div class="map-pin" style="top:55%; left:55%">🍜</div>
+        <div class="map-pin" style="top:20%; left:62%">🍔</div>
+        <div class="map-pin" style="top:68%; left:30%">☕</div>
+        <div class="map-label">📍 You are near Fakulti Bldg</div>
+      </div>
+
+      <div class="section-title">Stalls Near You</div>
+
+      <div class="card food-card">
+        <div class="food-emoji" style="background:#EFF6FF">🍜</div>
+        <div class="food-details">
+          <h4>Fakulti Noodles</h4>
+          <div class="meta">50m away • Open Now</div>
+          <div class="food-footer">
+            <span class="price">from RM 5.00</span>
+            <span class="badge badge-green">5 min wait</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card">
+        <div class="food-emoji" style="background:#FFF7ED">☕</div>
+        <div class="food-details">
+          <h4>Brew Corner</h4>
+          <div class="meta">120m away • Open Now</div>
+          <div class="food-footer">
+            <span class="price">from RM 3.50</span>
+            <span class="badge badge-green">3 min wait</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="section-title">Crowd Level</div>
+      <div class="card">
+        <div style="font-size:0.82rem; font-weight:600; margin-bottom:4px;">Central Kiosk</div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:88%; background: var(--primary);"></div></div>
+        <div style="font-size:0.72rem; color:var(--muted);">Very busy — try Library Corner (5 min wait)</div>
+      </div>
+      <div class="card">
+        <div style="font-size:0.82rem; font-weight:600; margin-bottom:4px;">Library Corner</div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:30%; background: var(--success);"></div></div>
+        <div style="font-size:0.72rem; color:var(--muted);">Calm now — great time to order!</div>
+      </div>
+    </section>
+
+    <!-- AI PICKS -->
+    <section id="ai" class="screen">
+      <div class="ai-hero">
+        <div class="hero-label">✨ Powered by AI</div>
+        <h2>Smart Picks for You</h2>
+        <p>Based on your Friday patterns & budget.</p>
+      </div>
+
+      <div class="section-title">Your Usual Order</div>
+      <div class="card food-card" onclick="addToCart('Nasi Goreng + Iced Tea', 'RM 6.00', '🍳')">
+        <div class="food-emoji" style="background:#FFF7ED">🍳</div>
+        <div class="food-details">
+          <h4>Nasi Goreng + Iced Tea</h4>
+          <div class="meta">Ordered 6× this month</div>
+          <div class="food-footer">
+            <span class="price">RM 6.00</span>
+            <span class="badge badge-green">Ready fast</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="section-title">Queue Forecast (Now)</div>
+      <div class="card">
+        <div class="queue-bar-wrap">
+          <div class="queue-row">
+            <span>Kolej Stall</span>
+            <div class="queue-track"><div class="queue-fill" style="width:70%; background:var(--accent);"></div></div>
+            <span class="queue-time">18m</span>
+          </div>
+          <div class="queue-row">
+            <span>Central Kiosk</span>
+            <div class="queue-track"><div class="queue-fill" style="width:90%; background:var(--primary);"></div></div>
+            <span class="queue-time">25m</span>
+          </div>
+          <div class="queue-row">
+            <span>Library Corner</span>
+            <div class="queue-track"><div class="queue-fill" style="width:20%; background:var(--success);"></div></div>
+            <span class="queue-time">5m</span>
+          </div>
+          <div class="queue-row">
+            <span>Brew Corner</span>
+            <div class="queue-track"><div class="queue-fill" style="width:35%; background:var(--success);"></div></div>
+            <span class="queue-time">8m</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">AI Suggestion</div>
+      <div class="card" style="border-left: 4px solid var(--purple);">
+        <div style="font-size:0.82rem; font-weight:700; margin-bottom:4px;">💡 Best time to order today</div>
+        <p style="font-size:0.78rem; color:var(--muted); line-height:1.5;">Order at <b style="color:var(--text)">10:45 AM</b> during your timetable gap to receive it right after Chemistry Lab ends at 1PM with only a <b style="color:var(--success)">5-min wait</b>.</p>
+      </div>
+    </section>
+
+    <!-- TIMETABLE -->
+    <section id="timetable" class="screen">
+      <div class="section-title">Your Timetable — Friday</div>
+
+      <div class="slot busy">
+        <div>
+          <b>08:00 – 10:00</b>
+          <small>Biology Lecture • Bilik 3</small>
+        </div>
+        <span class="badge badge-orange">Class</span>
+      </div>
+      <div class="slot free-gap">
+        <div>
+          <b>10:00 – 11:00</b>
+          <small>Free Gap Detected 🎉</small>
+        </div>
+        <button class="chip active" style="font-size:0.75rem; padding:6px 14px;" onclick="navigate('menu')">Order Now</button>
+      </div>
+      <div class="slot busy">
+        <div>
+          <b>11:00 – 13:00</b>
+          <small>Chemistry Lab • Lab A4</small>
+        </div>
+        <span class="badge badge-orange">Class</span>
+      </div>
+      <div class="slot" style="border-left-color: #E5E7EB; margin-top:4px;">
+        <div>
+          <b>13:00 – 14:00</b>
+          <small>Lunch Break</small>
+        </div>
+        <span class="badge badge-green">Free</span>
+      </div>
+
+      <div class="section-title" style="margin-top:16px;">Pre-order for Later</div>
+      <div class="card">
+        <div style="font-size:0.82rem; font-weight:600; margin-bottom:4px;">🤖 AI Recommendation</div>
+        <p style="font-size:0.78rem; color:var(--muted); margin-bottom:12px; line-height:1.5;">Schedule your order for <b style="color:var(--text)">10:45 AM</b> to receive it right after your lab ends.</p>
+        <input type="time" value="10:45" style="width:100%; padding:10px 14px; border-radius:10px; border:1px solid var(--border); font-family:'Nunito',sans-serif; font-size:0.85rem; font-weight:600; background:var(--bg); color:var(--text); outline:none;" />
+        <button class="hero-btn" style="width:100%; justify-content:center; margin-top:10px; background:var(--primary); color:white;" onclick="showToast('Order Scheduled!', 'Your order will be placed at 10:45 AM. 🕙', '✅')">
+          Schedule Order
+        </button>
+      </div>
+    </section>
+
+    <!-- ORDERS / TRACKING -->
+    <section id="orders" class="screen">
+      <div class="section-title">Live Tracking</div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.7rem; font-weight:700; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:3px;">Order #MF-8829</div>
+            <b style="font-size:0.95rem;">Ayam Penyet Set</b>
+          </div>
+          <span class="badge badge-orange">On the Way</span>
+        </div>
+
+        <!-- Track Steps -->
+        <div style="display:flex; align-items:center;">
+          <div class="track-step">
+            <div class="track-dot done">✓</div>
+            <div class="track-label done">Confirmed</div>
+          </div>
+          <div class="track-line done"></div>
+          <div class="track-step">
+            <div class="track-dot done">✓</div>
+            <div class="track-label done">Preparing</div>
+          </div>
+          <div class="track-line done"></div>
+          <div class="track-step">
+            <div class="track-dot active-step">🚴</div>
+            <div class="track-label active-step">On Way</div>
+          </div>
+          <div class="track-line"></div>
+          <div class="track-step">
+            <div class="track-dot">📍</div>
+            <div class="track-label">Arrived</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="rider-card">
+          <div class="rider-avatar">🧑</div>
+          <div class="rider-info">
+            <b>Amir Hassan</b>
+            <small>⭐ 4.9 • 312 deliveries</small>
+          </div>
+          <div class="eta-pill">~5 min</div>
+        </div>
+        <div class="divider" style="margin-top:12px;"></div>
+        <div style="display:flex; gap:16px; margin-top:10px;">
+          <div style="font-size:0.78rem; color:var(--muted);">📍 <b style="color:var(--text)">Fakulti Pin — Safe Zone A</b></div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:4px;">Order Summary</div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:8px;">
+          <span>Ayam Penyet Set</span><span style="font-weight:700;">RM 7.50</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:8px;">
+          <span style="color:var(--muted);">Delivery fee</span><span style="color:var(--muted);">RM 0.50</span>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-top:8px;">
+          <b>Total</b><b style="color:var(--primary);">RM 8.00</b>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section id="menu" class="screen">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <span>Search all stalls & meals...</span>
+      </div>
+      <div class="chip-row">
+        <div class="chip active">All</div>
+        <div class="chip">🍱 Combos</div>
+        <div class="chip">🥤 Drinks</div>
+        <div class="chip">⚡ Quick Sets</div>
+        <div class="chip">🌱 Vegetarian</div>
+      </div>
+
+      <div class="section-title">All Items</div>
+
+      <div class="card food-card" onclick="addToCart('Student Combo A', 'RM 8.00', '🍱')">
+        <div class="food-emoji">🍱</div>
+        <div class="food-details">
+          <h4>Student Combo A</h4>
+          <div class="meta">Chicken Rice + Iced Milo • Central Kiosk</div>
+          <div class="food-footer">
+            <span class="price">RM 8.00</span>
+            <span class="badge badge-orange">15 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Cheese Burger', 'RM 6.50', '🍔')">
+        <div class="food-emoji">🍔</div>
+        <div class="food-details">
+          <h4>Cheese Burger</h4>
+          <div class="meta">Stall C • Fakulti Area</div>
+          <div class="food-footer">
+            <span class="price">RM 6.50</span>
+            <span class="badge badge-green">8 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Nasi Goreng + Iced Tea', 'RM 6.00', '🍳')">
+        <div class="food-emoji">🍳</div>
+        <div class="food-details">
+          <h4>Nasi Goreng + Iced Tea</h4>
+          <div class="meta">Kolej Stall • Your Usual</div>
+          <div class="food-footer">
+            <span class="price">RM 6.00</span>
+            <span class="badge badge-green">10 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Mee Goreng Mamak', 'RM 5.50', '🍝')">
+        <div class="food-emoji">🍝</div>
+        <div class="food-details">
+          <h4>Mee Goreng Mamak</h4>
+          <div class="meta">Mamak Corner • Library</div>
+          <div class="food-footer">
+            <span class="price">RM 5.50</span>
+            <span class="badge badge-red">25 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+
+      <div class="card food-card" onclick="addToCart('Teh Tarik + Roti', 'RM 4.00', '🍞')">
+        <div class="food-emoji">🍞</div>
+        <div class="food-details">
+          <h4>Teh Tarik + Roti Canai</h4>
+          <div class="meta">Mamak Corner • Library</div>
+          <div class="food-footer">
+            <span class="price">RM 4.00</span>
+            <span class="badge badge-green">5 min</span>
+          </div>
+        </div>
+        <button class="add-btn">+</button>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile" class="screen">
+      <div style="text-align:center; padding: 20px 0 10px;">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-name">Ahmad Rasyid</div>
+        <div class="profile-sub">UPM Student · Serdang Campus</div>
+        <div class="profile-badge-row">
+          <span class="badge badge-orange">🥇 Gold Member</span>
+          <span class="badge badge-green">32 Orders</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:0.7rem; color:var(--muted); font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-bottom:10px;">Account</div>
+        <div class="menu-row">
+          <div class="menu-row-icon">❤️</div>
+          <span class="menu-row-label">Favourite Meals</span>
+          <span class="menu-row-arrow">›</span>
+        </div>
+        <div class="divider"></div>
+        <div class="menu-row">
+          <div class="menu-row-icon">📜</div>
+          <span class="menu-row-label">Order History</span>
+          <span class="menu-row-arrow">›</span>
+        </div>
+        <div class="divider"></div>
+        <div class="menu-row">
+          <div class="menu-row-icon">🎁</div>
+          <span class="menu-row-label">Rewards & Points</span>
+          <span class="menu-row-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:0.7rem; color:var(--muted); font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-bottom:10px;">Preferences</div>
+        <div class="menu-row">
+          <div class="menu-row-icon">🔔</div>
+          <span class="menu-row-label">Notifications</span>
+          <span class="menu-row-arrow">›</span>
+        </div>
+        <div class="divider"></div>
+        <div class="menu-row" onclick="toggleDark()">
+          <div class="menu-row-icon">🌙</div>
+          <span class="menu-row-label">Dark Mode</span>
+          <span class="menu-row-arrow">›</span>
+        </div>
+        <div class="divider"></div>
+        <div class="menu-row">
+          <div class="menu-row-icon">📅</div>
+          <span class="menu-row-label">Timetable Settings</span>
+          <span class="menu-row-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:20px;">
+        <div style="font-size:0.7rem; color:var(--muted); margin-bottom:6px;">Total saved this month</div>
+        <div style="font-family:'Nunito',sans-serif; font-size:2rem; font-weight:800; color:var(--primary);">RM 12.50</div>
+        <div style="font-size:0.72rem; color:var(--muted); margin-top:4px;">Using Smart Order suggestions 🤖</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav>
+    <div class="nav-item active" id="nav-home" onclick="navigate('home', 'nav-home')">
+      <span class="nav-icon">🏠</span>Home
+    </div>
+    <div class="nav-item" id="nav-map" onclick="navigate('map', 'nav-map')">
+      <span class="nav-icon">📍</span>Map
+    </div>
+    <div class="nav-item" id="nav-ai" onclick="navigate('ai', 'nav-ai')">
+      <span class="nav-icon">🤖</span>AI
+    </div>
+    <div class="nav-item" id="nav-orders" onclick="navigate('orders', 'nav-orders')">
+      <span class="nav-icon">📦</span>Orders
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="navigate('profile', 'nav-profile')">
+      <span class="nav-icon">👤</span>Profile
+    </div>
+  </nav>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toast-icon">🔔</span>
+    <div class="toast-body">
+      <div class="toast-title" id="toast-title">Notification</div>
+      <div class="toast-msg" id="toast-msg">Message here</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Screen nav
+  const screenNavMap = {
+    home:'nav-home', map:'nav-map', ai:'nav-ai',
+    orders:'nav-orders', menu:'nav-orders', timetable:'nav-ai', profile:'nav-profile'
+  };
+
+  function navigate(screenId, navId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(screenId);
+    if (target) target.classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const activeNav = navId || screenNavMap[screenId];
+    const navEl = document.getElementById(activeNav);
+    if (navEl) navEl.classList.add('active');
+
+    document.getElementById('main-scroll').scrollTop = 0;
+  }
+
+  // Toast
+  let toastTimer;
+  function showToast(title, msg, icon = '🔔') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-title').textContent = title;
+    document.getElementById('toast-msg').textContent = msg;
+    document.getElementById('toast-icon').textContent = icon;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  function addToCart(name, price, emoji) {
+    showToast(`Added to cart`, `${emoji} ${name} (${price}) — go to Orders to track.`, '🛒');
+    setTimeout(() => navigate('orders', 'nav-orders'), 1200);
+  }
+
+  // Dark mode
+  function toggleDark() {
+    document.getElementById('app').classList.toggle('dark-mode');
+    const isDark = document.getElementById('app').classList.contains('dark-mode');
+    showToast(isDark ? 'Dark Mode On' : 'Light Mode On', isDark ? 'Night owl mode activated 🌙' : 'Back to the bright side ☀️', isDark ? '🌙' : '☀️');
+  }
+
+  // Auto toast on load
+  setTimeout(() => {
+    showToast('Timetable Gap Detected', '1-hour break at 10AM! Pre-order lunch now 🍱', '🤖');
+  }, 2500);
+</script>
 </body>
 </html>
