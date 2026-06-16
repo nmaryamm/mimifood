@@ -58,6 +58,7 @@
       0 0 0 2px #444,
       0 30px 80px rgba(0,0,0,0.6),
       inset 0 1px 0 rgba(255,255,255,0.08);
+    pointer-events: none;
   }
   .phone-outer::before {
     content: '';
@@ -82,6 +83,7 @@
     position: absolute;
     background: #333;
     border-radius: 3px;
+    pointer-events: none;
   }
   .phone-power { right: -10px; top: 120px; width: 5px; height: 60px; }
   .phone-vol1  { left: -10px; top: 110px; width: 5px; height: 36px; }
@@ -93,6 +95,7 @@
     background: var(--bg);
     border-radius: 44px;
     overflow: hidden;
+    z-index: 1;
   }
 
   /* ── STATUS BAR ── */
@@ -123,17 +126,17 @@
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transform: translateX(100%);
-    transition: opacity var(--transition), transform var(--transition);
+    transform: scale(0.97) translateY(10px);
+    transition: opacity 0.26s cubic-bezier(.4,0,.2,1), transform 0.26s cubic-bezier(.4,0,.2,1);
   }
   .screen.active {
     opacity: 1;
     pointer-events: all;
-    transform: translateX(0);
+    transform: scale(1) translateY(0);
   }
   .screen.slide-out {
     opacity: 0;
-    transform: translateX(-40px);
+    transform: scale(1.015) translateY(-5px);
   }
   .screen-scroll {
     position: absolute;
@@ -559,8 +562,11 @@
   .ai-online { width: 7px; height: 7px; background: #22C55E; border-radius: 50%; }
 
   .ai-chat-area {
-    padding: 16px 16px 0; overflow-y: auto;
-    height: calc(100% - 178px);
+    padding: 16px 16px 8px; overflow-y: auto;
+    position: absolute;
+    top: 106px;
+    bottom: 130px;
+    left: 0; right: 0;
   }
   .ai-chat-area::-webkit-scrollbar { display: none; }
 
@@ -594,8 +600,13 @@
   }
 
   .ai-quick-btns {
-    display: flex; gap: 7px; flex-wrap: wrap; padding: 0 16px 10px;
+    display: flex; gap: 7px; flex-wrap: wrap; padding: 6px 16px 6px;
+    position: absolute; bottom: 72px; left: 0; right: 0;
+    background: #F8F9FF;
+    overflow-x: auto;
+    flex-wrap: nowrap;
   }
+  .ai-quick-btns::-webkit-scrollbar { display: none; }
   .ai-quick-btn {
     padding: 8px 13px;
     background: #fff; border: 1.5px solid var(--border);
@@ -610,8 +621,9 @@
 
   .ai-input-row {
     display: flex; gap: 8px; align-items: center;
-    padding: 10px 16px 28px;
+    padding: 8px 16px 20px;
     background: #fff; border-top: 1px solid var(--border);
+    position: absolute; bottom: 0; left: 0; right: 0;
   }
   .ai-input {
     flex: 1; padding: 12px 14px;
@@ -1146,6 +1158,25 @@
   .class-name { font-size: 12px; font-weight: 600; color: var(--text); }
   .class-loc { font-size: 10px; color: var(--text-muted); }
 
+
+  /* Heart favourite button */
+  .heart-btn {
+    position: absolute; top: 8px; right: 8px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transition: transform 0.2s, background 0.15s;
+    z-index: 5;
+    flex-shrink: 0;
+  }
+  .heart-btn:active { transform: scale(1.3); }
+  .heart-btn.loved { background: #FEE2E2; }
+  .food-card { position: relative; }
+  .food-card-img { position: relative; }
+
   /* loading animation for AI */
   .typing-dots {
     display: flex; gap: 4px; align-items: center; padding: 4px 0;
@@ -1192,6 +1223,46 @@
     0% { transform: scale(0.5); opacity: 1; }
     100% { transform: scale(2.5); opacity: 0; }
   }
+
+  @keyframes fabPulse {
+    0%,100% { box-shadow: 0 4px 18px rgba(255,122,0,0.45); transform: scale(1); }
+    50% { box-shadow: 0 4px 28px rgba(255,122,0,0.7); transform: scale(1.06); }
+  }
+
+  /* Desktop ambient label */
+  .desktop-hint {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.4); font-size: 12px; font-weight: 500;
+    letter-spacing: 0.3px; pointer-events: none; white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Smooth modal overlay */
+  .modal-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+    z-index: 300; display: flex; align-items: flex-end;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-sheet {
+    background: #fff; border-radius: 24px 24px 0 0;
+    padding: 20px 20px 40px; width: 100%;
+    animation: slideUp 0.35s cubic-bezier(.4,0,.2,1);
+  }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 18px;
+  }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+
+  /* Responsive: on narrow viewports, full-screen the phone */
+  @media (max-width: 500px) {
+    body { background: #000; align-items: stretch; justify-content: stretch; }
+    .phone-wrap { width: 100%; height: 100dvh; }
+    .phone-outer { display: none; }
+    .phone-screen { border-radius: 0; }
+    .desktop-hint { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -1218,7 +1289,7 @@
         <div class="splash-logo">MimiFood</div>
         <div class="splash-tagline">Smart Campus Food Delivery · UPM</div>
         <div class="splash-loader"><div class="splash-loader-bar"></div></div>
-        <button class="splash-btn" onclick="navigate('home')">Continue →</button>
+        <button class="splash-btn" onclick="navigate('onboarding')">Continue →</button>
       </div>
     </div>
 
@@ -1227,7 +1298,7 @@
     ══════════════════════════ -->
     <div class="screen" id="screen-onboarding">
       <div class="status-bar dark"><span class="status-time">9:41</span><div class="status-icons">📶 🔋</div></div>
-      <div class="onboard-skip" onclick="navigate('home')">Skip</div>
+      <div class="onboard-skip" onclick="navigate('timetable')">Skip</div>
       <div class="onboard-wrap">
         <div class="onboard-slides">
           <div class="onboard-slide active" id="ob0">
@@ -1259,7 +1330,114 @@
             <div class="dot" id="dot3" onclick="goSlide(3)"></div>
           </div>
           <button class="btn btn-primary" id="ob-next-btn" onclick="nextSlide()">Next</button>
-          <button class="btn btn-secondary" onclick="navigate('home')" style="font-weight:600;color:var(--text-muted)">Skip for now</button>
+          <button class="btn btn-secondary" onclick="navigate('timetable')" style="font-weight:600;color:var(--text-muted)">Skip for now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════
+         SCREEN 2b · TIMETABLE SETUP
+    ══════════════════════════ -->
+    <div class="screen" id="screen-timetable">
+      <div class="status-bar dark"><span class="status-time">9:41</span><div class="status-icons">📶 🔋</div></div>
+      <div style="background:#fff;padding:54px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--text)">Your Timetable</div>
+          <div style="font-size:11px;color:var(--text-muted)">Mimi uses this to plan your meals 🤖</div>
+        </div>
+        <button onclick="navigate('home');showToast('✅ Timetable saved!')" style="margin-left:auto;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">Save</button>
+      </div>
+
+      <div class="screen-scroll" style="top:106px;bottom:0">
+        <div style="padding:16px">
+          <!-- AI explanation -->
+          <div class="ai-insight" style="margin-bottom:16px">
+            <div class="ai-insight-icon">🤖</div>
+            <div class="ai-insight-text">I'll use your timetable to detect <strong>free slots</strong>, recommend <strong>ideal order times</strong>, and make sure food arrives <strong>before your next class</strong>.</div>
+          </div>
+
+          <!-- Day: Monday -->
+          <div style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:13px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">Monday</div>
+              <button onclick="showToast('+ Class added to Monday')" style="background:var(--secondary);color:var(--primary);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">+ Add Class</button>
+            </div>
+            <div class="class-chip">
+              <div class="class-time">8:00–10:00 AM</div>
+              <div style="flex:1"><div class="class-name">EKT3004 Embedded Systems</div><div class="class-loc">📍 DK2, FKEE</div></div>
+              <span onclick="showToast('Class removed')" style="font-size:16px;cursor:pointer;color:var(--text-muted);padding-left:6px">✕</span>
+            </div>
+            <div class="class-chip">
+              <div class="class-time">2:00–4:00 PM</div>
+              <div style="flex:1"><div class="class-name">SKM3204 Computer Graphics</div><div class="class-loc">📍 Lab 3, FSKTM</div></div>
+              <span onclick="showToast('Class removed')" style="font-size:16px;cursor:pointer;color:var(--text-muted);padding-left:6px">✕</span>
+            </div>
+            <!-- Free slot badge -->
+            <div style="background:linear-gradient(135deg,#DCFCE7,#BBF7D0);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-top:4px">
+              <span style="font-size:14px">⏰</span>
+              <div style="font-size:11px;font-weight:700;color:#15803D">Free: 10:00 AM–2:00 PM · <span style="color:var(--primary)">Ideal lunch window!</span></div>
+            </div>
+          </div>
+
+          <!-- Day: Tuesday -->
+          <div style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:13px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">Tuesday</div>
+              <button onclick="showToast('+ Class added to Tuesday')" style="background:var(--secondary);color:var(--primary);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">+ Add Class</button>
+            </div>
+            <div style="background:#F9F9F9;border-radius:10px;padding:12px;text-align:center;color:var(--text-muted);font-size:12px;border:1.5px dashed var(--border)">No classes — full free day 🎉</div>
+          </div>
+
+          <!-- Day: Wednesday -->
+          <div style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:13px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">Wednesday</div>
+              <button onclick="showToast('+ Class added')" style="background:var(--secondary);color:var(--primary);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">+ Add Class</button>
+            </div>
+            <div class="class-chip">
+              <div class="class-time">10:00 AM–12:00 PM</div>
+              <div style="flex:1"><div class="class-name">TK3001 Design Studio</div><div class="class-loc">📍 Studio A, FRSB</div></div>
+              <span onclick="showToast('Class removed')" style="font-size:16px;cursor:pointer;color:var(--text-muted);padding-left:6px">✕</span>
+            </div>
+            <div style="background:linear-gradient(135deg,#DCFCE7,#BBF7D0);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-top:4px">
+              <span style="font-size:14px">⏰</span>
+              <div style="font-size:11px;font-weight:700;color:#15803D">Free: 12:00–6:00 PM · <span style="color:var(--primary)">Long lunch + dinner window</span></div>
+            </div>
+          </div>
+
+          <!-- Day: Thursday -->
+          <div style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:13px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">Thursday</div>
+              <button onclick="showToast('+ Class added')" style="background:var(--secondary);color:var(--primary);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">+ Add Class</button>
+            </div>
+            <div style="background:#F9F9F9;border-radius:10px;padding:12px;text-align:center;color:var(--text-muted);font-size:12px;border:1.5px dashed var(--border)">No classes yet — tap + to add</div>
+          </div>
+
+          <!-- Day: Friday -->
+          <div style="margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:13px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.8px">Friday</div>
+              <button onclick="showToast('+ Class added')" style="background:var(--secondary);color:var(--primary);border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer">+ Add Class</button>
+            </div>
+            <div class="class-chip">
+              <div class="class-time">8:00–9:00 AM</div>
+              <div style="flex:1"><div class="class-name">KOE3012 Research Methods</div><div class="class-loc">📍 Bilik Seminar 4</div></div>
+              <span onclick="showToast('Class removed')" style="font-size:16px;cursor:pointer;color:var(--text-muted);padding-left:6px">✕</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;padding-bottom:24px">
+            <button class="btn btn-primary" onclick="navigate('home');showToast('✅ Timetable saved! Mimi is ready 🐱')">Save Timetable →</button>
+            <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary" onclick="document.getElementById('tt-file-input').click()" style="flex:1;font-weight:700;color:var(--primary)">📁 Upload File (.ics/.csv)</button>
+            <button class="btn btn-secondary" onclick="importSample()" style="flex:1;font-weight:700;color:var(--text-muted)">📋 Use Sample</button>
+          </div>
+          <input type="file" id="tt-file-input" accept=".ics,.csv,.xlsx,.txt" style="display:none" onchange="handleTimetableFile(event)"/>
+            <button class="btn" onclick="navigate('home')" style="background:transparent;color:var(--text-muted);font-weight:600;font-size:13px">Skip for now</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1281,10 +1459,16 @@
               🔔<div class="home-notif-dot"></div>
             </button>
           </div>
-          <div class="search-bar" onclick="navigate('discover')">
-            <span style="font-size:16px">🔍</span>
-            <span>Search food, stall, cuisine…</span>
+          <div class="search-bar" style="padding:0 14px">
+            <span style="font-size:16px;flex-shrink:0">🔍</span>
+            <input id="home-search" type="text" placeholder="Search food, stall, cuisine…"
+              style="border:none;outline:none;background:transparent;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;flex:1;padding:12px 0"
+              oninput="liveSearch(this.value)"
+              onfocus="document.getElementById('home-search-results').style.display='block'"
+              onblur="setTimeout(()=>document.getElementById('home-search-results').style.display='none',200)"/>
+            <span id="home-search-clear" style="font-size:14px;cursor:pointer;display:none;color:var(--text-muted)" onclick="clearSearch()">✕</span>
           </div>
+          <div id="home-search-results" style="display:none;position:absolute;top:160px;left:16px;right:16px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.14);z-index:200;overflow:hidden;max-height:260px;overflow-y:auto" id="search-dropdown"></div>
         </div>
 
         <div class="home-body">
@@ -1411,7 +1595,7 @@
             <div style="flex:1">
               <div class="night-banner-title">Night Food Finder</div>
               <div class="night-banner-desc">Hungry after 9 PM? 6 stalls still open near your hostel.</div>
-              <button class="btn btn-xs" onclick="navigate('discover')" style="margin-top:6px;background:var(--accent);color:var(--text);border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">Explore Now →</button>
+              <button class="btn btn-xs" onclick="goNightFood()" style="margin-top:6px;background:var(--accent);color:var(--text);border:none;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">Explore Now →</button>
             </div>
           </div>
 
@@ -1457,6 +1641,19 @@
           </div>
         </div>
       </div>
+
+      <!-- Floating Mimi AI Button -->
+      <button onclick="navigate('ai')" style="
+        position:absolute;bottom:86px;right:16px;
+        width:52px;height:52px;border-radius:50%;
+        background:linear-gradient(135deg,#FF8C00,#FF5500);
+        border:none;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;
+        font-size:24px;
+        box-shadow:0 4px 18px rgba(255,122,0,0.45);
+        z-index:40;
+        animation:fabPulse 3s ease-in-out infinite;
+      " title="Ask Mimi AI">🐱</button>
 
       <!-- Bottom Nav -->
       <div class="bottom-nav">
@@ -1531,9 +1728,12 @@
       <div class="status-bar dark"><span class="status-time">9:41</span><div class="status-icons">📶 🔋</div></div>
       <div class="discover-header">
         <div class="discover-title">Explore Food 🍽️</div>
-        <div class="search-bar" style="background:var(--bg);border:1px solid var(--border)">
-          <span style="font-size:16px">🔍</span>
-          <span>Search cuisine or stall…</span>
+        <div class="search-bar" style="background:var(--bg);border:1px solid var(--border);padding:0 14px">
+          <span style="font-size:16px;flex-shrink:0">🔍</span>
+          <input id="discover-search" type="text" placeholder="Search cuisine or stall…"
+            style="border:none;outline:none;background:transparent;font-size:13px;color:var(--text);font-family:'Inter',sans-serif;flex:1;padding:12px 0"
+            oninput="discoverSearch(this.value)"/>
+          <span id="disc-clear" style="font-size:14px;cursor:pointer;display:none;color:var(--text-muted)" onclick="document.getElementById('discover-search').value='';discoverSearch('')">✕</span>
         </div>
       </div>
       <div class="screen-scroll" style="top:158px;bottom:76px">
@@ -1905,7 +2105,100 @@
         </div>
       </div>
       <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border)">
-        <button class="btn btn-primary" onclick="navigate('payment')">Continue to Payment →</button>
+        <button class="btn btn-primary" onclick="navigate('split')">Continue to Split Payment →</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════
+         SCREEN 9b · SPLIT PAYMENT
+    ══════════════════════════ -->
+    <div class="screen" id="screen-split">
+      <div class="status-bar dark"><span class="status-time">9:41</span><div class="status-icons">📶 🔋</div></div>
+      <div style="background:#fff;padding:54px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div style="font-size:18px;font-weight:800;color:var(--text)">Split Payment</div>
+      </div>
+
+      <div class="screen-scroll" style="top:100px;bottom:80px">
+        <div style="padding:16px">
+
+          <!-- Tab toggle -->
+          <div style="display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:16px">
+            <button id="sp-tab1" onclick="switchSplitTab(1)" style="flex:1;padding:9px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:var(--primary);color:#fff;transition:all 0.2s">Split with Friends</button>
+            <button id="sp-tab2" onclick="switchSplitTab(2)" style="flex:1;padding:9px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.2s">Invite Link</button>
+          </div>
+
+          <!-- Total summary -->
+          <div style="background:linear-gradient(135deg,var(--primary),#FF5500);border-radius:16px;padding:16px;margin-bottom:16px;color:#fff">
+            <div style="font-size:12px;opacity:0.85;margin-bottom:4px">Group Order Total</div>
+            <div style="font-size:32px;font-weight:900;letter-spacing:-1px">RM24.00</div>
+            <div style="font-size:11px;opacity:0.75;margin-top:4px">3 people · Delivery shared RM0.67 each</div>
+            <div style="margin-top:10px;background:rgba(255,255,255,0.15);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;font-weight:600">Your share</span>
+              <span style="font-size:18px;font-weight:900">RM8.00</span>
+            </div>
+          </div>
+
+          <!-- Participants -->
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Participants (3)</div>
+
+          <div class="participant-row">
+            <div class="p-avatar" style="background:linear-gradient(135deg,#FF8C00,#FF5500)">M</div>
+            <div style="flex:1">
+              <div class="p-name">Maryam (You)</div>
+              <div class="p-method">💙 TNG eWallet</div>
+            </div>
+            <div class="p-amount">RM8.00</div>
+            <div style="margin-left:8px"><span class="badge badge-green">✓ Paid</span></div>
+          </div>
+
+          <div class="participant-row">
+            <div class="p-avatar" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)">A</div>
+            <div style="flex:1">
+              <div class="p-name">Aleyah</div>
+              <div class="p-method">💳 Credit Card</div>
+            </div>
+            <div class="p-amount">RM8.00</div>
+            <div style="margin-left:8px">
+              <span class="badge badge-red" style="cursor:pointer" onclick="showToast('📲 Reminder sent to Aleyah!')">⏳ Pending</span>
+            </div>
+          </div>
+
+          <div class="participant-row">
+            <div class="p-avatar" style="background:linear-gradient(135deg,#22C55E,#16A34A)">N</div>
+            <div style="flex:1">
+              <div class="p-name">Nia</div>
+              <div class="p-method">💳 Debit Card</div>
+            </div>
+            <div class="p-amount">RM8.00</div>
+            <div style="margin-left:8px"><span class="badge badge-green">✓ Paid</span></div>
+          </div>
+
+          <!-- Add more -->
+          <button onclick="showToast('📲 Invite link copied!')" style="width:100%;padding:12px;background:var(--secondary);border:1.5px dashed var(--primary);border-radius:12px;color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;margin-top:4px;margin-bottom:16px">+ Add Friend</button>
+
+          <!-- Payment progress -->
+          <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:var(--shadow-card);margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:13px;font-weight:700;color:var(--text)">Payment Progress</span>
+              <span style="font-size:12px;font-weight:700;color:var(--success)">2/3 paid</span>
+            </div>
+            <div style="background:var(--border);border-radius:6px;height:8px;overflow:hidden">
+              <div style="background:linear-gradient(90deg,var(--success),#16A34A);height:100%;width:66.6%;border-radius:6px;transition:width 0.5s"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Waiting for Aleyah · <span style="color:var(--primary);cursor:pointer" onclick="showToast('📲 Reminder sent!')">Send reminder</span></div>
+          </div>
+
+          <div class="ai-insight">
+            <div class="ai-insight-icon">🤖</div>
+            <div class="ai-insight-text">Order will be placed once <strong>all payments are confirmed</strong>. You can also proceed and Aleyah pays on delivery.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border);display:flex;gap:10px">
+        <button class="btn btn-secondary" style="flex:1;font-size:13px;font-weight:700;color:var(--primary)" onclick="showToast('📲 Reminder sent to Aleyah!')">Remind All</button>
+        <button class="btn btn-primary" style="flex:2" onclick="navigate('payment')">Proceed Payment →</button>
       </div>
     </div>
 
@@ -2081,47 +2374,80 @@
       <div class="orders-header">
         <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:12px">My Orders</div>
         <div class="tab-bar">
-          <div class="tab-item active">Active (1)</div>
-          <div class="tab-item">Past Orders</div>
-          <div class="tab-item">Scheduled</div>
+          <div class="tab-item active" onclick="switchOrderTab(0,this)">Active (1)</div>
+          <div class="tab-item" onclick="switchOrderTab(1,this)">Past Orders</div>
+          <div class="tab-item" onclick="switchOrderTab(2,this)">Scheduled</div>
         </div>
       </div>
-      <div class="screen-scroll" style="top:148px;bottom:76px">
-        <div style="padding:14px 16px 0">
-          <!-- Active order -->
+      <!-- Orders tabs content -->
+      <div id="orders-active" class="screen-scroll" style="top:148px;bottom:76px">
+        <div style="padding:14px 16px 20px">
           <div class="order-history-item" onclick="navigate('tracking')" style="border:1.5px solid var(--primary)">
             <div class="order-item-header">
-              <div><div style="font-size:13px;font-weight:800;color:var(--text)">Order #MF-7821</div><div class="order-date">Today · 10:20 AM</div></div>
+              <div><div style="font-size:13px;font-weight:800;color:var(--text)">Order #MF-7821</div><div class="order-date">Today, Sun 14 Jun · 10:20 AM</div></div>
               <span class="badge badge-orange" style="font-size:12px;padding:5px 10px">🛵 On the way</span>
             </div>
             <div class="order-items-preview">🍛 Nasi Ayam Goreng · 🥤 Iced Milo</div>
-            <div class="order-footer">
-              <div class="order-total">RM11.00</div>
-              <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();navigate('tracking')">Track Order →</button>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <div><div class="order-total">RM11.00</div><div style="font-size:10px;color:var(--text-muted)">Kolej Kitchen · Standard Delivery</div></div>
+              <button class="btn btn-primary btn-xs" onclick="event.stopPropagation();navigate('tracking')">Track →</button>
             </div>
           </div>
+          <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No other active orders</div>
+        </div>
+      </div>
 
-          <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin:16px 0 8px">Yesterday</div>
-          <div class="order-history-item" onclick="showToast('Reordering…')">
+      <div id="orders-past" class="screen-scroll" style="top:148px;bottom:76px;display:none">
+        <div style="padding:14px 16px 20px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Yesterday · Sat 13 Jun</div>
+          <div class="order-history-item">
             <div class="order-item-header">
-              <div><div style="font-size:13px;font-weight:700;color:var(--text)">Order #MF-7810</div><div class="order-date">June 10 · 1:15 PM</div></div>
-              <span class="badge badge-green">Delivered ✓</span>
+              <div><div style="font-size:13px;font-weight:700;color:var(--text)">Order #MF-7810</div><div class="order-date">Sat 13 Jun · 1:15 PM</div></div>
+              <span class="badge badge-green">✓ Delivered</span>
             </div>
             <div class="order-items-preview">🍜 Tomyam Noodles · 🥤 Teh Tarik</div>
-            <div class="order-footer">
-              <div class="order-total">RM10.50</div>
-              <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();showToast('🔁 Reordering Tomyam…')">Reorder</button>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <div><div class="order-total">RM10.50</div><div style="font-size:10px;color:var(--text-muted)">Kolej Kitchen · 7 min delivery ⚡</div></div>
+              <button class="btn btn-secondary btn-xs" onclick="showToast('🔁 Reordering Tomyam Noodles…')">Reorder</button>
             </div>
           </div>
-          <div class="order-history-item" onclick="showToast('Order details')">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">Fri 13 Jun</div>
+          <div class="order-history-item">
             <div class="order-item-header">
-              <div><div style="font-size:13px;font-weight:700;color:var(--text)">Order #MF-7798</div><div class="order-date">June 9 · 7:30 PM</div></div>
-              <span class="badge badge-green">Delivered ✓</span>
+              <div><div style="font-size:13px;font-weight:700;color:var(--text)">Order #MF-7798</div><div class="order-date">Fri 13 Jun · 7:30 PM</div></div>
+              <span class="badge badge-green">✓ Delivered</span>
             </div>
             <div class="order-items-preview">🍱 Bento Set · 🧋 Teh Ais</div>
-            <div class="order-footer">
-              <div class="order-total">RM12.90</div>
-              <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();showToast('🔁 Reordering Bento…')">Reorder</button>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <div><div class="order-total">RM12.90</div><div style="font-size:10px;color:var(--text-muted)">Warung Sri Putra · 12 min delivery</div></div>
+              <button class="btn btn-secondary btn-xs" onclick="showToast('🔁 Reordering Bento Set…')">Reorder</button>
+            </div>
+          </div>
+          <div class="order-history-item">
+            <div class="order-item-header">
+              <div><div style="font-size:13px;font-weight:700;color:var(--text)">Order #MF-7785</div><div class="order-date">Fri 13 Jun · 12:45 PM</div></div>
+              <span class="badge badge-green">✓ Delivered</span>
+            </div>
+            <div class="order-items-preview">🍛 Nasi Lemak Set · ☕ Teh O Ais</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <div><div class="order-total">RM6.50</div><div style="font-size:10px;color:var(--text-muted)">Kolej Kitchen · 5 min delivery ⚡</div></div>
+              <button class="btn btn-secondary btn-xs" onclick="showToast('🔁 Reordering Nasi Lemak…')">Reorder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="orders-scheduled" class="screen-scroll" style="top:148px;bottom:76px;display:none">
+        <div style="padding:14px 16px 20px">
+          <div class="order-history-item" style="border:1.5px solid #6366F1">
+            <div class="order-item-header">
+              <div><div style="font-size:13px;font-weight:800;color:var(--text)">Order #MF-7825</div><div class="order-date">Scheduled · Mon 15 Jun · 1:00 PM</div></div>
+              <span class="badge badge-blue" style="font-size:12px;padding:5px 10px">📅 Scheduled</span>
+            </div>
+            <div class="order-items-preview">🍛 Nasi Ayam Goreng · 🥤 Iced Milo</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+              <div><div class="order-total">RM11.00</div><div style="font-size:10px;color:#6366F1;font-weight:600">Arrives during your 12:30–2 PM break ✅</div></div>
+              <button class="btn btn-xs" onclick="showToast('Order cancelled')" style="background:#FEE2E2;color:#DC2626;border:none;font-size:11px;font-weight:700;border-radius:8px;padding:6px 12px;cursor:pointer">Cancel</button>
             </div>
           </div>
         </div>
@@ -2153,15 +2479,15 @@
 
         <div style="padding:0 0 16px">
           <div class="profile-section">
-            <div class="profile-item" onclick="showToast('📅 Timetable editor coming soon')">
+            <div class="profile-item" onclick="openTimetableModal()">
               <div class="pi-icon" style="background:#FFF0E0">📅</div>
               <div class="pi-label">My Timetable</div>
               <div class="pi-arrow">›</div>
             </div>
-            <div class="profile-item" onclick="showToast('❤️ Opening favourites…')">
+            <div class="profile-item" onclick="openFavModal()">
               <div class="pi-icon" style="background:#FFE8E8">❤️</div>
               <div class="pi-label">Favourite Meals</div>
-              <div class="pi-arrow">›</div>
+              <div class="pi-arrow"><span id="fav-count-badge" style="background:var(--primary);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;margin-right:6px">0</span>›</div>
             </div>
             <div class="profile-item" onclick="showToast('🏠 Address settings')">
               <div class="pi-icon" style="background:#E8F4FF">🏠</div>
@@ -2200,25 +2526,6 @@
           </div>
         </div>
 
-        <!-- My Timetable Preview -->
-        <div style="margin:0 16px 16px">
-          <div class="section-title" style="margin-bottom:10px">📅 My Timetable — This Week</div>
-          <div style="background:#fff;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-card)">
-            <div class="timetable-day">
-              <div class="timetable-day-label">Monday</div>
-              <div class="class-chip"><div class="class-time">8:00–10:00 AM</div><div><div class="class-name">EKT3004 Embedded Systems</div><div class="class-loc">📍 DK2, FKEE</div></div></div>
-              <div class="class-chip"><div class="class-time">2:00–4:00 PM</div><div><div class="class-name">SKM3204 Computer Graphics</div><div class="class-loc">📍 Lab 3, FSKTM</div></div></div>
-            </div>
-            <div class="timetable-day">
-              <div class="timetable-day-label">Wednesday</div>
-              <div class="class-chip"><div class="class-time">10:00 AM–12:00 PM</div><div><div class="class-name">TK3001 Design Studio</div><div class="class-loc">📍 Studio A, FRSB</div></div></div>
-            </div>
-            <div class="timetable-day">
-              <div class="timetable-day-label">Friday</div>
-              <div class="class-chip"><div class="class-time">8:00–9:00 AM</div><div><div class="class-name">KOE3012 Research Methods</div><div class="class-loc">📍 Bilik Seminar 4</div></div></div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="bottom-nav">
@@ -2232,8 +2539,86 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
+    <!-- SCHEDULE DELIVERY MODAL -->
+    <div class="modal-overlay" id="schedule-modal" style="display:none" onclick="closeScheduleModal(event)">
+      <div class="modal-sheet" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">📅 Schedule Delivery</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">Choose when you want your food delivered</div>
+
+        <div class="ai-insight" style="margin-bottom:14px">
+          <div class="ai-insight-icon">🤖</div>
+          <div class="ai-insight-text">You have a free slot at <strong>12:30 PM</strong>. Recommended delivery: <strong>12:25 PM</strong> so food is hot when class ends! ✅</div>
+        </div>
+
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">Quick Picks</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="time-slot-btns">
+          <button class="chip chip-orange" onclick="selectTimeSlot(this,'12:00 PM')">12:00 PM</button>
+          <button class="chip chip-light" onclick="selectTimeSlot(this,'12:25 PM')">12:25 PM ⭐</button>
+          <button class="chip chip-light" onclick="selectTimeSlot(this,'12:30 PM')">12:30 PM</button>
+          <button class="chip chip-light" onclick="selectTimeSlot(this,'1:00 PM')">1:00 PM</button>
+          <button class="chip chip-light" onclick="selectTimeSlot(this,'1:30 PM')">1:30 PM</button>
+          <button class="chip chip-light" onclick="selectTimeSlot(this,'6:00 PM')">6:00 PM</button>
+        </div>
+
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">Or pick a custom time</div>
+        <input type="time" value="12:25" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;margin-bottom:16px;outline:none;color:var(--text)"/>
+
+        <button class="btn btn-primary" onclick="confirmSchedule()">Confirm Scheduled Delivery →</button>
+      </div>
+    </div>
+
+    <!-- TIMETABLE MODAL -->
+    <div class="modal-overlay" id="timetable-modal" style="display:none" onclick="if(event.target===this)closeTimetableModal()">
+      <div class="modal-sheet" style="max-height:82%;overflow-y:auto" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:18px;font-weight:800;color:var(--text)">My Timetable</div>
+          <button onclick="closeTimetableModal()" style="background:var(--border);border:none;border-radius:10px;width:32px;height:32px;font-size:16px;cursor:pointer">X</button>
+        </div>
+        <div class="timetable-day">
+          <div class="timetable-day-label">Monday</div>
+          <div class="class-chip"><div class="class-time">8:00-10:00 AM</div><div><div class="class-name">EKT3004 Embedded Systems</div><div class="class-loc">DK2, FKEE</div></div></div>
+          <div class="class-chip"><div class="class-time">2:00-4:00 PM</div><div><div class="class-name">SKM3204 Computer Graphics</div><div class="class-loc">Lab 3, FSKTM</div></div></div>
+          <div style="background:#DCFCE7;border-radius:8px;padding:8px 10px;margin-top:4px;font-size:11px;font-weight:700;color:#15803D">Free 10AM-2PM - Ideal lunch window!</div>
+        </div>
+        <div class="timetable-day" style="margin-top:12px">
+          <div class="timetable-day-label">Tuesday</div>
+          <div style="background:#F9F9F9;border-radius:10px;padding:10px;text-align:center;color:var(--text-muted);font-size:12px;border:1.5px dashed var(--border)">No classes</div>
+        </div>
+        <div class="timetable-day" style="margin-top:12px">
+          <div class="timetable-day-label">Wednesday</div>
+          <div class="class-chip"><div class="class-time">10:00 AM-12:00 PM</div><div><div class="class-name">TK3001 Design Studio</div><div class="class-loc">Studio A, FRSB</div></div></div>
+        </div>
+        <div class="timetable-day" style="margin-top:12px">
+          <div class="timetable-day-label">Friday</div>
+          <div class="class-chip"><div class="class-time">8:00-9:00 AM</div><div><div class="class-name">KOE3012 Research Methods</div><div class="class-loc">Bilik Seminar 4</div></div></div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px" onclick="closeTimetableModal();navigate('timetable')">Edit Timetable</button>
+      </div>
+    </div>
+
+    <!-- FAVOURITES MODAL -->
+    <div class="modal-overlay" id="fav-modal" style="display:none" onclick="if(event.target===this)closeFavModal()">
+      <div class="modal-sheet" style="max-height:80%;overflow-y:auto" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:18px;font-weight:800;color:var(--text)">Favourite Meals</div>
+          <button onclick="closeFavModal()" style="background:var(--border);border:none;border-radius:10px;width:32px;height:32px;font-size:16px;cursor:pointer">X</button>
+        </div>
+        <div id="fav-list-container"></div>
+        <div id="fav-empty" style="text-align:center;padding:32px 0">
+          <div style="font-size:48px;margin-bottom:12px">cat</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No favourites yet!</div>
+          <div style="font-size:13px;color:var(--text-muted)">Tap the heart on any meal to save it here</div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /phone-screen -->
 </div><!-- /phone-wrap -->
+
+<div class="desktop-hint">MimiFood Prototype · Interact inside the phone · Built for UPM FYP 2025</div>
 
 <script>
 // ══════════════════════════════
@@ -2294,6 +2679,8 @@ function navigate(screen) {
   setTimeout(() => prev.classList.remove('slide-out'), 350);
   next.classList.add('active');
   currentScreen = screen;
+  // Re-inject hearts for any new cards
+  setTimeout(injectHeartButtons, 320);
 }
 
 function goBack() {
@@ -2317,7 +2704,7 @@ function nextSlide() {
   if (obSlide < 3) {
     goSlide(obSlide + 1);
   } else {
-    navigate('home');
+    navigate('timetable');
   }
 }
 
@@ -2368,6 +2755,47 @@ function selectDel(n) {
   for (let i = 1; i <= 3; i++) {
     document.getElementById('del' + i).classList.toggle('selected', i === n);
   }
+  if (n === 2) {
+    // Open schedule modal
+    setTimeout(() => {
+      document.getElementById('schedule-modal').style.display = 'flex';
+    }, 200);
+  }
+}
+
+function closeScheduleModal(e) {
+  document.getElementById('schedule-modal').style.display = 'none';
+}
+
+function selectTimeSlot(btn, time) {
+  document.querySelectorAll('#time-slot-btns .chip').forEach(c => {
+    c.className = 'chip chip-light';
+  });
+  btn.className = 'chip chip-orange';
+}
+
+function confirmSchedule() {
+  document.getElementById('schedule-modal').style.display = 'none';
+  showToast('📅 Delivery scheduled! Food arrives at your selected time 🎉');
+}
+
+function switchSplitTab(n) {
+  const t1 = document.getElementById('sp-tab1');
+  const t2 = document.getElementById('sp-tab2');
+  if (n === 1) {
+    t1.style.background = 'var(--primary)'; t1.style.color = '#fff';
+    t2.style.background = 'transparent'; t2.style.color = 'var(--text-muted)';
+  } else {
+    t2.style.background = 'var(--primary)'; t2.style.color = '#fff';
+    t1.style.background = 'transparent'; t1.style.color = 'var(--text-muted)';
+    showToast('🔗 Invite link: mimifood.app/group/MF7821');
+  }
+}
+
+// Night food navigate helper
+function goNightFood() {
+  navigate('discover');
+  setTimeout(() => showToast('🌙 Showing stalls open after 9 PM near you'), 400);
 }
 
 // Payment
@@ -2490,28 +2918,394 @@ function aiAddToCart(btn) {
 }
 
 // ETA countdown animation
+let etaTimer = null;
 function startEtaCountdown() {
+  if (etaTimer) return;
   let mins = 8;
   const el = document.getElementById('eta-countdown');
   if (!el) return;
-  const t = setInterval(() => {
-    if (mins <= 0) { clearInterval(t); el.textContent = 'Arriving!'; return; }
+  etaTimer = setInterval(() => {
+    if (mins <= 0) { clearInterval(etaTimer); etaTimer = null; el.textContent = 'Arriving! 🎉'; return; }
     mins--;
     el.textContent = mins + ' min';
-  }, 8000);
+  }, 6000);
 }
 
-// Auto-start ETA when tracking screen is visited
-const origNavigate = navigate;
-window.navigate = function(screen) {
-  origNavigate(screen);
-  if (screen === 'tracking') setTimeout(startEtaCountdown, 500);
-};
+// Hook tracking screen start
+document.addEventListener('DOMContentLoaded', () => {
+  const trackingScreen = document.getElementById('screen-tracking');
+  const obs = new MutationObserver(() => {
+    if (trackingScreen.classList.contains('active')) startEtaCountdown();
+  });
+  obs.observe(trackingScreen, { attributes: true, attributeFilter: ['class'] });
 
-// Splash: auto-show continue after loader
-setTimeout(() => {
-  document.querySelector('.splash-btn').style.animation = 'fadeUp 0.4s ease both';
-}, 2200);
+  // Chip filter click (home & discover screens)
+  document.querySelectorAll('.filters-row .chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const row = this.closest('.filters-row');
+      row.querySelectorAll('.chip').forEach(c => {
+        c.className = 'chip chip-gray';
+      });
+      this.className = 'chip chip-orange';
+    });
+  });
+
+  // Tab bar interaction (discover)
+  document.querySelectorAll('.tab-item').forEach(tab => {
+    tab.addEventListener('click', function() {
+      this.closest('.tab-bar').querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Payment method click
+  document.querySelectorAll('.payment-method').forEach((pm, i) => {
+    pm.addEventListener('click', () => selectPM(i + 1));
+  });
+
+  // Inject heart buttons on food cards
+  setTimeout(injectHeartButtons, 300);
+  // Show smart notification on home after 3s
+  setTimeout(() => {
+    if (currentScreen === 'home') showSmartNotif();
+  }, 3000);
+});
+
+// Import sample timetable
+function importSample() {
+  showToast('Sample UPM CS timetable loaded!');
+  // Show sample data visually in chip format - already shown in timetable screen
+}
+
+// Smart notification banner
+let notifShown = false;
+function showSmartNotif() {
+  if (notifShown || currentScreen !== 'home') return;
+  notifShown = true;
+  const notif = document.createElement('div');
+  notif.id = 'smart-notif';
+  notif.innerHTML = `
+    <div style="position:absolute;top:56px;left:12px;right:12px;z-index:500;
+      background:#fff;border-radius:16px;padding:14px 16px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.18);
+      border-left:4px solid var(--primary);
+      animation:slideNotif 0.4s cubic-bezier(.4,0,.2,1) both">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="font-size:24px;flex-shrink:0">🤖</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px">Mimi Suggestion</div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.5">You have a <strong style="color:var(--primary)">45-min break at 1 PM</strong>. Pre-order now so food arrives right when class ends! 🍛</div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button onclick="navigate('detail');dismissNotif()" style="background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">Order Now</button>
+            <button onclick="dismissNotif()" style="background:var(--border);color:var(--text-muted);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">Later</button>
+          </div>
+        </div>
+        <div onclick="dismissNotif()" style="font-size:18px;color:var(--text-muted);cursor:pointer;padding:2px;line-height:1">✕</div>
+      </div>
+    </div>`;
+  const phoneScreen = document.querySelector('.phone-screen');
+  phoneScreen.appendChild(notif);
+}
+
+function dismissNotif() {
+  const n = document.getElementById('smart-notif');
+  if (n) n.remove();
+}
+// ════════════════════════════════════
+// FIX 4: Orders tab switching
+// ════════════════════════════════════
+function switchOrderTab(index, el) {
+  const tabs = ['orders-active','orders-past','orders-scheduled'];
+  tabs.forEach((id, i) => {
+    const panel = document.getElementById(id);
+    if (panel) panel.style.display = i === index ? 'block' : 'none';
+  });
+  if (el) {
+    el.closest('.tab-bar').querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+}
+
+// ════════════════════════════════════
+// FIX 5: Timetable modal
+// ════════════════════════════════════
+function openTimetableModal() {
+  document.getElementById('timetable-modal').style.display = 'flex';
+}
+function closeTimetableModal() {
+  document.getElementById('timetable-modal').style.display = 'none';
+}
+
+// ════════════════════════════════════
+// FIX 6: Favourites system
+// ════════════════════════════════════
+let favourites = [];
+
+const ALL_MEALS = [
+  { id:'m1', emoji:'🍛', name:'Nasi Ayam Goreng',   price:'RM6.50', stall:'Kolej Kitchen' },
+  { id:'m2', emoji:'🍜', name:'Tomyam Noodles',     price:'RM8.50', stall:'Kolej Kitchen' },
+  { id:'m3', emoji:'🍱', name:'Bento Set',           price:'RM9.90', stall:'Warung Sri Putra' },
+  { id:'m4', emoji:'🫕', name:'Chicken Curry Rice',  price:'RM7.00', stall:'Kolej Kitchen' },
+  { id:'m5', emoji:'🍚', name:'Nasi Lemak Set',      price:'RM4.50', stall:'Kolej Kitchen' },
+  { id:'m6', emoji:'🥪', name:'Roti John',           price:'RM5.00', stall:'Warung Sri Putra' },
+  { id:'m7', emoji:'🥚', name:'Mee Goreng Telur',    price:'RM5.50', stall:'Kolej Kitchen' },
+  { id:'m8', emoji:'🥤', name:'Iced Milo',           price:'RM2.50', stall:'Kolej Kitchen' },
+];
+
+function toggleFav(mealId, btn) {
+  const idx = favourites.findIndex(f => f.id === mealId);
+  if (idx === -1) {
+    const meal = ALL_MEALS.find(m => m.id === mealId);
+    if (meal) {
+      favourites.push(meal);
+      if (btn) { btn.textContent = '❤️'; btn.classList.add('loved'); }
+      showToast('Added to favourites!');
+    }
+  } else {
+    favourites.splice(idx, 1);
+    if (btn) { btn.textContent = '🤍'; btn.classList.remove('loved'); }
+    showToast('Removed from favourites');
+  }
+  updateFavBadge();
+  refreshFavList();
+}
+
+function updateFavBadge() {
+  const badge = document.getElementById('fav-count-badge');
+  if (badge) badge.textContent = favourites.length;
+}
+
+function refreshFavList() {
+  const container = document.getElementById('fav-list-container');
+  const empty = document.getElementById('fav-empty');
+  if (!container) return;
+  if (favourites.length === 0) {
+    container.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  container.innerHTML = favourites.map(m => `
+    <div style="display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:12px;padding:11px 12px;margin-bottom:8px">
+      <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#FFE4CC,#FFB380);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${m.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${m.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${m.stall} · ${m.price}</div>
+      </div>
+      <button onclick="removeFavById('${m.id}')" style="background:#FEE2E2;border:none;border-radius:9px;width:32px;height:32px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">🗑️</button>
+    </div>`
+  ).join('');
+}
+
+function removeFavById(mealId) {
+  const idx = favourites.findIndex(f => f.id === mealId);
+  if (idx !== -1) favourites.splice(idx, 1);
+  updateFavBadge();
+  refreshFavList();
+  // Un-heart corresponding button in UI
+  const btn = document.querySelector(`.heart-btn[data-id="${mealId}"]`);
+  if (btn) { btn.textContent = '🤍'; btn.classList.remove('loved'); }
+  if (favourites.length === 0) showToast('All favourites cleared');
+}
+
+function openFavModal() {
+  refreshFavList();
+  document.getElementById('fav-modal').style.display = 'flex';
+}
+function closeFavModal() {
+  document.getElementById('fav-modal').style.display = 'none';
+}
+
+// Inject heart buttons into food cards after DOM ready
+function injectHeartButtons() {
+  const cardDefs = [
+    { selector: '#screen-home .food-card:nth-child(1)', id: 'm1' },
+    { selector: '#screen-home .food-card:nth-child(2)', id: 'm2' },
+    { selector: '#screen-home .food-card:nth-child(3)', id: 'm3' },
+    { selector: '#screen-home .food-card:nth-child(4)', id: 'm4' },
+  ];
+  // Inject on all food-card img containers
+  document.querySelectorAll('.food-card .food-card-img').forEach((img, i) => {
+    if (img.querySelector('.heart-btn')) return; // already added
+    const mealId = 'm' + ((i % 8) + 1);
+    const btn = document.createElement('button');
+    btn.className = 'heart-btn';
+    btn.setAttribute('data-id', mealId);
+    btn.textContent = '🤍';
+    btn.onclick = function(e) {
+      e.stopPropagation();
+      toggleFav(mealId, btn);
+    };
+    img.style.position = 'relative';
+    img.appendChild(btn);
+  });
+  // Also inject on stall menu items
+  document.querySelectorAll('.stall-body .food-card, #screen-stall .food-card').forEach((card, i) => {
+    if (card.querySelector('.heart-btn')) return;
+    const mealId = 'm' + ((i % 8) + 1);
+    const btn = document.createElement('button');
+    btn.className = 'heart-btn';
+    btn.setAttribute('data-id', mealId);
+    btn.textContent = '🤍';
+    btn.style.cssText = 'position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:5;flex-shrink:0;transition:transform 0.2s';
+    btn.onclick = function(e) {
+      e.stopPropagation();
+      toggleFav(mealId, btn);
+    };
+    card.style.position = 'relative';
+    card.appendChild(btn);
+  });
+}
+
+// ════════════════════════════════════
+// FIX 2: Live search
+// ════════════════════════════════════
+const SEARCH_DATA = [
+  { name:'Nasi Ayam Goreng', emoji:'🍛', price:'RM6.50', time:'8 min', stall:'Kolej Kitchen' },
+  { name:'Tomyam Noodles', emoji:'🍜', price:'RM8.50', time:'10 min', stall:'Kolej Kitchen' },
+  { name:'Nasi Lemak Set', emoji:'🍚', price:'RM4.50', time:'5 min', stall:'Kolej Kitchen' },
+  { name:'Bento Set', emoji:'🍱', price:'RM9.90', time:'10 min', stall:'Warung Sri Putra' },
+  { name:'Roti John', emoji:'🥪', price:'RM5.00', time:'7 min', stall:'Warung Sri Putra' },
+  { name:'Mee Goreng Telur', emoji:'🥚', price:'RM5.50', time:'9 min', stall:'Kolej Kitchen' },
+  { name:'Iced Milo', emoji:'🥤', price:'RM2.50', time:'3 min', stall:'Kolej Kitchen' },
+  { name:'Chicken Curry Rice', emoji:'🫕', price:'RM7.00', time:'6 min', stall:'Kolej Kitchen' },
+  { name:'Ayam Penyet', emoji:'🍛', price:'RM7.50', time:'9 min', stall:'Warung Sri Putra' },
+  { name:'Kolej Kitchen', emoji:'🏪', price:'', time:'', stall:'Stall · 700m · Open' },
+  { name:'Warung Sri Putra', emoji:'🥘', price:'', time:'', stall:'Stall · 1.2km · Open' },
+  { name:'Western Corner', emoji:'🍔', price:'', time:'', stall:'Stall · 900m · Open' },
+];
+
+function liveSearch(q) {
+  const el = document.getElementById('home-search');
+  const clr = document.getElementById('home-search-clear');
+  const box = document.getElementById('home-search-results');
+  if (clr) clr.style.display = q ? 'block' : 'none';
+  if (!q.trim()) { if (box) box.innerHTML = ''; return; }
+  const results = SEARCH_DATA.filter(d => d.name.toLowerCase().includes(q.toLowerCase()));
+  if (!box) return;
+  if (results.length === 0) {
+    box.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px">No results for "'+q+'"</div>';
+    return;
+  }
+  box.innerHTML = results.slice(0,6).map(r => `
+    <div onclick="navigate('detail');document.getElementById('home-search-results').style.display='none'"
+      style="display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s"
+      onmouseover="this.style.background='#FFF8F0'" onmouseout="this.style.background=''">
+      <div style="font-size:22px;width:36px;text-align:center">${r.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${r.name}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${r.stall}${r.price ? ' · ' + r.price + ' · ' + r.time : ''}</div>
+      </div>
+      ${r.price ? '<div style="font-size:13px;font-weight:800;color:var(--primary)">'+r.price+'</div>' : ''}
+    </div>`
+  ).join('');
+}
+
+function clearSearch() {
+  const el = document.getElementById('home-search');
+  const box = document.getElementById('home-search-results');
+  const clr = document.getElementById('home-search-clear');
+  if (el) el.value = '';
+  if (box) box.innerHTML = '';
+  if (clr) clr.style.display = 'none';
+}
+
+function discoverSearch(q) {
+  const clr = document.getElementById('disc-clear');
+  if (clr) clr.style.display = q ? 'block' : 'none';
+}
+
+// ════════════════════════════════════
+// FIX 1: Timetable file upload
+// ════════════════════════════════════
+function handleTimetableFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  showToast('Reading ' + file.name + '...');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+    let parsed = [];
+    if (ext === 'ics') {
+      parsed = parseICS(content);
+    } else if (ext === 'csv' || ext === 'txt') {
+      parsed = parseCSV(content);
+    } else {
+      showToast('Imported ' + file.name + ' - please verify classes below');
+      return;
+    }
+    if (parsed.length > 0) {
+      renderParsedTimetable(parsed);
+      showToast('Synced ' + parsed.length + ' classes from ' + file.name + '!');
+    } else {
+      showToast('Could not read format. Try .ics or .csv');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseICS(text) {
+  const events = [];
+  const blocks = text.split('BEGIN:VEVENT');
+  blocks.slice(1).forEach(block => {
+    const summary = (block.match(/SUMMARY:(.+)/) || [])[1];
+    const location = (block.match(/LOCATION:(.+)/) || [])[1];
+    const dtstart = (block.match(/DTSTART[^:]*:(\d{8}T\d{6})/) || [])[1];
+    const dtend = (block.match(/DTEND[^:]*:(\d{8}T\d{6})/) || [])[1];
+    if (summary) {
+      let startTime = '', endTime = '', day = '';
+      if (dtstart) {
+        const h = dtstart.slice(9,11), m = dtstart.slice(11,13);
+        const ampm = +h >= 12 ? 'PM' : 'AM';
+        startTime = ((+h % 12) || 12) + ':' + m + ' ' + ampm;
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const yr=+dtstart.slice(0,4), mo=+dtstart.slice(4,6)-1, dy=+dtstart.slice(6,8);
+        day = dayNames[new Date(yr,mo,dy).getDay()];
+      }
+      if (dtend) {
+        const h = dtend.slice(9,11), m = dtend.slice(11,13);
+        const ampm = +h >= 12 ? 'PM' : 'AM';
+        endTime = ((+h % 12) || 12) + ':' + m + ' ' + ampm;
+      }
+      events.push({ name: summary.trim(), location: (location||'').trim(), startTime, endTime, day });
+    }
+  });
+  return events;
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const events = [];
+  lines.slice(1).forEach(line => {
+    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
+    if (cols.length >= 3) {
+      events.push({ name: cols[0]||'Class', day: cols[1]||'', startTime: cols[2]||'', endTime: cols[3]||'', location: cols[4]||'' });
+    }
+  });
+  return events;
+}
+
+function renderParsedTimetable(events) {
+  // Group by day and update the timetable screen class chips
+  const byDay = {};
+  events.forEach(e => {
+    const d = e.day || 'Other';
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(e);
+  });
+  // Show result in a toast + update timetable screen visually
+  const days = Object.keys(byDay);
+  showToast('Loaded: ' + days.join(', ') + ' (' + events.length + ' classes)');
+}
+
+
 </script>
+<style>
+@keyframes slideNotif {
+  from { opacity: 0; transform: translateY(-14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+</style>
 </body>
 </html>
