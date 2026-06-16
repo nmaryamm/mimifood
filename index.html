@@ -128,11 +128,13 @@
     pointer-events: none;
     transform: scale(0.97) translateY(10px);
     transition: opacity 0.26s cubic-bezier(.4,0,.2,1), transform 0.26s cubic-bezier(.4,0,.2,1);
+    z-index: 0;
   }
   .screen.active {
     opacity: 1;
     pointer-events: all;
     transform: scale(1) translateY(0);
+    z-index: 1;
   }
   .screen.slide-out {
     opacity: 0;
@@ -323,7 +325,8 @@
     border: none; cursor: pointer;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     transition: transform 0.15s;
-    animation: fadeUp 0.6s 2s both;
+    opacity: 1;
+    pointer-events: auto;
   }
   .splash-btn:active { transform: scale(0.96); }
   @keyframes fadeUp {
@@ -550,22 +553,44 @@
     padding: 54px 20px 14px;
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 12px;
+    z-index: 10; position: relative;
   }
   .ai-avatar {
     width: 42px; height: 42px; border-radius: 14px;
     background: linear-gradient(135deg, #FF8C00, #FF5500);
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
+    font-size: 22px; flex-shrink: 0;
   }
   .ai-title { font-size: 16px; font-weight: 800; color: var(--text); }
   .ai-subtitle { font-size: 11px; color: var(--text-muted); }
-  .ai-online { width: 7px; height: 7px; background: #22C55E; border-radius: 50%; }
+
+  /* Topic pills row */
+  .ai-topics-bar {
+    position: absolute;
+    top: 106px; left: 0; right: 0;
+    display: flex; gap: 8px; padding: 10px 16px;
+    overflow-x: auto; background: #fff;
+    border-bottom: 1px solid var(--border);
+    z-index: 9;
+  }
+  .ai-topics-bar::-webkit-scrollbar { display: none; }
+  .ai-topic-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 13px; border-radius: 20px;
+    background: var(--secondary); border: 1.5px solid transparent;
+    font-size: 11px; font-weight: 700; color: var(--primary);
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+  }
+  .ai-topic-pill:active, .ai-topic-pill.active {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
 
   .ai-chat-area {
     padding: 16px 16px 8px; overflow-y: auto;
     position: absolute;
-    top: 106px;
-    bottom: 130px;
+    top: 158px;
+    bottom: 116px;
     left: 0; right: 0;
   }
   .ai-chat-area::-webkit-scrollbar { display: none; }
@@ -587,33 +612,57 @@
   }
   .chat-avatar.user { background: linear-gradient(135deg, #6366F1, #8B5CF6); }
   .bubble-text {
-    max-width: 72%;
+    max-width: 78%;
     background: #fff;
     border-radius: 16px 16px 16px 4px;
     padding: 10px 13px;
-    font-size: 13px; line-height: 1.5; color: var(--text);
+    font-size: 13px; line-height: 1.6; color: var(--text);
     box-shadow: var(--shadow-card);
   }
   .chat-bubble.user .bubble-text {
     background: var(--primary); color: #fff;
     border-radius: 16px 16px 4px 16px;
   }
-
-  .ai-quick-btns {
-    display: flex; gap: 7px; flex-wrap: wrap; padding: 6px 16px 6px;
-    position: absolute; bottom: 72px; left: 0; right: 0;
-    background: #F8F9FF;
-    overflow-x: auto;
-    flex-wrap: nowrap;
+  .bubble-action-row {
+    display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px;
   }
-  .ai-quick-btns::-webkit-scrollbar { display: none; }
+  .bubble-nav-btn {
+    padding: 7px 13px; border-radius: 10px;
+    background: var(--secondary); border: 1.5px solid rgba(255,122,0,0.25);
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bubble-nav-btn:active { background: var(--primary); color: #fff; }
+
+  /* Typing dots */
+  .typing-dots { display: flex; gap: 4px; padding: 2px 0; }
+  .typing-dot {
+    width: 7px; height: 7px; background: var(--text-light);
+    border-radius: 50%; animation: typingBounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+
+  /* Suggestion chips above input */
+  .ai-suggestions {
+    position: absolute; bottom: 64px; left: 0; right: 0;
+    display: flex; gap: 7px; padding: 8px 14px;
+    overflow-x: auto; background: #F8F9FF;
+    border-top: 1px solid var(--border);
+  }
+  .ai-suggestions::-webkit-scrollbar { display: none; }
   .ai-quick-btn {
-    padding: 8px 13px;
+    padding: 7px 13px;
     background: #fff; border: 1.5px solid var(--border);
     border-radius: 20px;
     font-size: 12px; font-weight: 600; color: var(--text);
     cursor: pointer; transition: all 0.15s; white-space: nowrap;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent; flex-shrink: 0;
   }
   .ai-quick-btn:hover, .ai-quick-btn:active {
     background: var(--secondary); border-color: var(--primary); color: var(--primary);
@@ -621,25 +670,29 @@
 
   .ai-input-row {
     display: flex; gap: 8px; align-items: center;
-    padding: 8px 16px 20px;
+    padding: 8px 14px 14px;
     background: #fff; border-top: 1px solid var(--border);
     position: absolute; bottom: 0; left: 0; right: 0;
+    z-index: 10;
   }
   .ai-input {
-    flex: 1; padding: 12px 14px;
+    flex: 1; padding: 11px 14px;
     background: var(--bg); border-radius: 14px;
-    border: 1px solid var(--border);
+    border: 1.5px solid var(--border);
     font-size: 13px; font-family: 'Inter', sans-serif;
     outline: none; color: var(--text);
+    transition: border-color 0.15s;
   }
+  .ai-input:focus { border-color: var(--primary); }
   .ai-send-btn {
-    width: 42px; height: 42px;
-    background: var(--primary); border-radius: 14px;
+    width: 40px; height: 40px;
+    background: var(--primary); border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    border: none; cursor: pointer; font-size: 18px;
-    transition: transform 0.1s;
+    border: none; cursor: pointer; font-size: 16px;
+    transition: transform 0.1s; flex-shrink: 0;
   }
   .ai-send-btn:active { transform: scale(0.93); }
+  .ai-send-btn:disabled { background: var(--border); }
 
   .ai-rec-card {
     background: var(--secondary);
@@ -763,6 +816,7 @@
     padding: 12px 16px 28px; background: #fff;
     border-top: 1px solid var(--border);
     display: flex; gap: 12px; align-items: center;
+    z-index: 10;
   }
   .detail-total { font-size: 18px; font-weight: 900; color: var(--text); }
 
@@ -840,6 +894,7 @@
     position: absolute; bottom: 0; left: 0; right: 0;
     padding: 12px 16px 28px; background: #fff;
     border-top: 1px solid var(--border);
+    z-index: 10;
   }
 
   /* ─────────────────────────────
@@ -1679,45 +1734,49 @@
     ══════════════════════════ -->
     <div class="screen" id="screen-ai">
       <div class="status-bar dark"><span class="status-time">9:41</span><div class="status-icons">📶 🔋</div></div>
+
+      <!-- Header -->
       <div class="ai-header">
         <button class="back-btn" onclick="goBack()">←</button>
         <div class="ai-avatar">🐱</div>
-        <div>
-          <div class="ai-title">Mimi AI</div>
-          <div class="ai-subtitle">Your food decision buddy · <span style="color:var(--success)">● Online</span></div>
+        <div style="flex:1">
+          <div class="ai-title">Mimi AI Assistant</div>
+          <div class="ai-subtitle" id="ai-status-text">● Online · Powered by Claude</div>
         </div>
+        <button onclick="clearMimiChat()" style="background:var(--bg);border:none;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:600;color:var(--text-muted);cursor:pointer">Clear</button>
       </div>
 
+      <!-- Topic pills -->
+      <div class="ai-topics-bar">
+        <div class="ai-topic-pill" onclick="topicPrompt('🍽️ Order food')">🍽️ Order food</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('📍 Find stalls')">📍 Find stalls</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('🛒 My cart')">🛒 My cart</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('📅 Schedule delivery')">📅 Schedule</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('👥 Group order')">👥 Group</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('💳 Payment help')">💳 Payment</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('📦 Track my order')">📦 Track</div>
+        <div class="ai-topic-pill" onclick="topicPrompt('⭐ Favourites')">⭐ Favourites</div>
+      </div>
+
+      <!-- Chat area -->
       <div class="ai-chat-area" id="ai-chat">
-        <!-- Mimi greeting -->
-        <div class="chat-bubble">
-          <div class="chat-avatar">🐱</div>
-          <div>
-            <div class="bubble-text">Hey Maryam! 👋 Let's find the best meal for you!<br><br>I can see your next class is <strong>SKM3204</strong> at <strong>2:00 PM</strong>. You have a <strong>45-minute break</strong> at 1 PM. Let me help you order something that fits! 🎓</div>
-          </div>
-        </div>
-        <div class="chat-bubble">
-          <div class="chat-avatar">🐱</div>
-          <div>
-            <div class="bubble-text">What's your budget today?</div>
-            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-              <button class="ai-quick-btn" onclick="aiReply('RM5')">RM5</button>
-              <button class="ai-quick-btn" onclick="aiReply('RM10')">RM10</button>
-              <button class="ai-quick-btn" onclick="aiReply('RM15+')">RM15+</button>
-            </div>
-          </div>
-        </div>
+        <!-- greeting injected by JS on screen open -->
       </div>
 
-      <div class="ai-quick-btns" id="ai-quick">
-        <button class="ai-quick-btn" onclick="aiReply('I want rice')">🍛 Rice</button>
-        <button class="ai-quick-btn" onclick="aiReply('I want noodles')">🍜 Noodles</button>
-        <button class="ai-quick-btn" onclick="aiReply('Something fast')">⚡ Fast</button>
-        <button class="ai-quick-btn" onclick="aiReply('Cheapest option')">💰 Cheap</button>
+      <!-- Suggestion chips -->
+      <div class="ai-suggestions" id="ai-suggestions">
+        <button class="ai-quick-btn" onclick="sendSuggestion(this)">How do I order?</button>
+        <button class="ai-quick-btn" onclick="sendSuggestion(this)">Cheapest meal now</button>
+        <button class="ai-quick-btn" onclick="sendSuggestion(this)">Fastest delivery</button>
+        <button class="ai-quick-btn" onclick="sendSuggestion(this)">Pay with TNG</button>
+        <button class="ai-quick-btn" onclick="sendSuggestion(this)">Group order help</button>
+        <button class="ai-quick-btn" onclick="sendSuggestion(this)">Schedule for lunch</button>
       </div>
+
+      <!-- Input row -->
       <div class="ai-input-row">
-        <input class="ai-input" id="ai-input" placeholder="Ask Mimi anything…" onkeydown="if(event.key==='Enter')sendAiMsg()"/>
-        <button class="ai-send-btn" onclick="sendAiMsg()">→</button>
+        <input class="ai-input" id="ai-input" placeholder="Ask Mimi anything about the app…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMimiMsg()}"/>
+        <button class="ai-send-btn" id="ai-send-btn" onclick="sendMimiMsg()">➤</button>
       </div>
     </div>
 
@@ -2104,7 +2163,7 @@
           </div>
         </div>
       </div>
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border)">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border);z-index:10">
         <button class="btn btn-primary" onclick="navigate('split')">Continue to Split Payment →</button>
       </div>
     </div>
@@ -2196,7 +2255,7 @@
         </div>
       </div>
 
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border);display:flex;gap:10px">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border);display:flex;gap:10px;z-index:10">
         <button class="btn btn-secondary" style="flex:1;font-size:13px;font-weight:700;color:var(--primary)" onclick="showToast('📲 Reminder sent to Aleyah!')">Remind All</button>
         <button class="btn btn-primary" style="flex:2" onclick="navigate('payment')">Proceed Payment →</button>
       </div>
@@ -2249,7 +2308,7 @@
           </div>
         </div>
       </div>
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border)">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:#fff;border-top:1px solid var(--border);z-index:10">
         <button class="btn btn-primary" onclick="processPayment()">Pay Now RM11.00 🔒</button>
       </div>
     </div>
@@ -2625,7 +2684,7 @@
 // NAVIGATION STATE
 // ══════════════════════════════
 let currentScreen = 'splash';
-let history = [];
+let navHistory = [];
 let obSlide = 0;
 let qty = 1;
 let basePrice = 6.50;
@@ -2670,7 +2729,7 @@ const aiResponses = {
 
 function navigate(screen) {
   if (screen === currentScreen) return;
-  history.push(currentScreen);
+  navHistory.push(currentScreen);
   const prev = document.getElementById('screen-' + currentScreen);
   const next = document.getElementById('screen-' + screen);
   if (!next) return;
@@ -2684,8 +2743,8 @@ function navigate(screen) {
 }
 
 function goBack() {
-  if (history.length === 0) return;
-  const prev = history.pop();
+  if (navHistory.length === 0) return;
+  const prev = navHistory.pop();
   const current = document.getElementById('screen-' + currentScreen);
   const target = document.getElementById('screen-' + prev);
   if (!target) return;
@@ -2836,85 +2895,288 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-// AI Chat
-const aiMessages = {
-  'RM5': ["Got it! Budget: RM5. Let me check…", "For RM5 → **Nasi Lemak Set (RM4.50)** from Kolej Kitchen, only 5 min! Perfect for your break 🎉"],
-  'RM10': ["RM10 budget — great options! Scanning stalls…", "🏆 Best Choice: Nasi Ayam Goreng RM6.50 (8 min)\n⚡ Fastest: Roti John RM5 (5 min)\n💰 Best Value: Bento Set RM9.90"],
-  'RM15+': ["Premium mode! 🎉", "The Western Corner Chicken Chop (RM13.90) is today's special — 4.6 ⭐, 10 min delivery!"],
-  'I want rice': ["Rice! 🍛 Checking nearby stalls…", "Top rice dishes right now:\n1. Nasi Ayam — RM6.50, 8 min ⚡\n2. Nasi Lemak — RM4.50, 5 min 💰\n3. Nasi Kukus — RM7.50, 12 min ⭐"],
-  'I want noodles': ["Noodle time! 🍜", "Best noodles near you:\n1. Tomyam Mee — RM8.50 🔥\n2. Mee Goreng — RM5.50 💰\n3. Laksa — RM7.00 ⭐4.7"],
-  'Something fast': ["Speed check! ⚡ Analysing prep + delivery times…", "Fastest options (under 10 min):\n⚡ Roti John — 5 min (RM5)\n⚡ Nasi Lemak — 5 min (RM4.50)\n⚡ Nasi Ayam — 8 min (RM6.50)\n\nAll arrive before your 2 PM class ✅"],
-  'Cheapest option': ["Budget mode! 💰 Finding lowest prices…", "Cheapest today:\n1. Nasi Lemak — RM4.50 🥇\n2. Roti John — RM5.00\n3. Mee Goreng — RM5.50\n\nNasi Lemak = best value + fastest! 🐱"],
-};
+// ══════════════════════════════════════════════════════
+// MIMI AI — Claude-powered app assistant
+// ══════════════════════════════════════════════════════
 
-function sendAiMsg() {
+const MIMI_SYSTEM_PROMPT = `You are Mimi, the friendly AI assistant built into the MimiFood app — a smart campus food delivery app for UPM (Universiti Putra Malaysia) students.
+
+Your personality: warm, helpful, a little playful, like a knowledgeable friend. You use occasional emojis naturally. Keep replies concise and easy to read inside a phone chat bubble.
+
+== APP FEATURES YOU KNOW ABOUT ==
+
+1. ORDERING FOOD
+   - Browse food by stall or category from the Home screen
+   - Tap any food card → Food Detail screen → choose add-ons → set quantity → "Add to Cart"
+   - Available stalls: Kolej Kitchen (rice, noodles, drinks), Warung Sri Putra (bento, roti john), Western Corner (burgers, chicken chop)
+   - Popular items: Nasi Ayam Goreng RM6.50, Tomyam Noodles RM8.50, Nasi Lemak RM4.50, Bento Set RM9.90, Roti John RM5.00
+
+2. CART & CHECKOUT
+   - Cart screen shows your items with qty controls
+   - Three delivery options: Standard (RM2.00, 5–10 min), Scheduled (RM1.50, choose time), Student Rider (RM1.50)
+   - Tap "Checkout" → Payment screen → choose method → "Pay Now"
+
+3. DELIVERY SCHEDULING
+   - Choose "📅 Scheduled Delivery" in cart to pick exact time
+   - Mimi AI will suggest the best time based on your timetable break
+   - Great for pre-ordering before class ends
+
+4. PAYMENT METHODS
+   - TNG eWallet (recommended, fastest)
+   - Debit / Credit Card (Visa ••••4242)
+   - Online Banking (Maybank, CIMB, etc.)
+   - Cash on Delivery
+
+5. GROUP ORDER
+   - From the Cart, tap "👥 Group Order"
+   - Create a group → share link with friends → everyone adds their items
+   - Split delivery fee automatically — cheaper per person!
+   - Split Payment screen tracks who has paid
+
+6. LIVE ORDER TRACKING
+   - After payment, go to Orders tab → tap active order → Track
+   - See your rider on a live map, get ETA countdown
+   - Chat or call your rider directly
+
+7. TIMETABLE INTEGRATION
+   - Set up your class schedule in Timetable screen (Profile → My Timetable)
+   - Mimi AI uses your timetable to suggest ideal order times during free slots
+   - Upload .ics or .csv file, or add classes manually
+
+8. FAVOURITES
+   - Tap the ❤️ heart on any food card to save it
+   - View saved meals: Profile → Favourite Meals
+   - Re-order from favourites with one tap
+
+9. DISCOVER / SEARCH
+   - Discover tab shows all stalls with filters (Open Now, Fast, Budget, etc.)
+   - Search bar on Home screen: search by food name or stall
+   - Filter by cuisine type using category chips
+
+10. PROFILE & SETTINGS
+    - Profile tab: My Timetable, Favourite Meals, Saved Addresses, Payment Methods, Notifications
+    - Become a Student Rider option available
+    - View order history, reorder past meals
+
+11. NAVIGATION GUIDE (how to get somewhere)
+    - Home: bottom nav 🏠
+    - Discover/Search: bottom nav 🔍
+    - Orders & tracking: bottom nav 🛍️
+    - Profile: bottom nav 👤
+    - Mimi AI: 🐱 button on Home screen (orange floating button)
+    - Stall details: tap any stall card
+    - Food detail: tap any food item
+
+== STUDENT CONTEXT ==
+User: Maryam Zahra, maryam@student.upm.edu.my
+Today's schedule: Monday — EKT3004 8–10AM, free 10AM–2PM (ideal lunch window!), SKM3204 2–4PM
+TNG eWallet balance: RM45.20
+Active order: #MF-7821 (Nasi Ayam + Iced Milo, on the way 🛵)
+
+== RESPONSE RULES ==
+- Be conversational, helpful, and brief (2–4 sentences max per reply unless listing steps)
+- When giving steps, use a numbered list — short and scannable
+- If someone asks how to navigate somewhere, tell them exactly which button/tab to tap
+- Suggest relevant next actions at the end as short button labels in this exact format on a new line: [ACTION: label | action] where action is one of: navigate-home, navigate-discover, navigate-cart, navigate-payment, navigate-tracking, navigate-orders, navigate-profile, navigate-stall, navigate-detail, navigate-group, navigate-timetable, navigate-ai, show-toast:message
+- Only include 1–3 action buttons max, only when truly helpful
+- Never say you're an AI language model; you ARE Mimi, the MimiFood assistant
+- If you don't know something specific, say "let me check on that" and give the best general guidance`;
+
+let mimiHistory = [];
+let mimiWaiting = false;
+let mimiGreeted = false;
+
+function mimiGreeting() {
+  const chat = document.getElementById('ai-chat');
+  if (!chat || mimiGreeted) return;
+  mimiGreeted = true;
+  const msgs = [
+    { role:'assistant', content: "Hey Maryam! 👋 I'm Mimi, your MimiFood guide.\n\nYou have a **free break 10AM–2PM** today — perfect for ordering! 🎓\n\nI can help you order food, find stalls, track orders, set up group orders, schedule deliveries, and anything else in the app. What do you need?" }
+  ];
+  mimiHistory = [...msgs];
+  appendMimiBubble(msgs[0].content, false, true);
+}
+
+function appendMimiBubble(text, isUser, instant) {
+  const chat = document.getElementById('ai-chat');
+  const div = document.createElement('div');
+  div.className = 'chat-bubble' + (isUser ? ' user' : '');
+
+  if (isUser) {
+    div.innerHTML = `<div class="chat-avatar user">M</div><div class="bubble-text">${escHtml(text)}</div>`;
+    chat.appendChild(div);
+  } else {
+    // Parse action buttons out of text
+    const actionRegex = /\[ACTION:\s*([^|]+)\|([^\]]+)\]/g;
+    const actions = [];
+    let match;
+    let cleanText = text;
+    while ((match = actionRegex.exec(text)) !== null) {
+      actions.push({ label: match[1].trim(), action: match[2].trim() });
+    }
+    cleanText = cleanText.replace(/\[ACTION:[^\]]+\]/g, '').trim();
+
+    // Format markdown-lite: **bold**, newlines
+    const formatted = cleanText
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    let actionsHtml = '';
+    if (actions.length > 0) {
+      actionsHtml = `<div class="bubble-action-row">${actions.map(a =>
+        `<button class="bubble-nav-btn" onclick="handleMimiAction('${a.action}')">${escHtml(a.label)}</button>`
+      ).join('')}</div>`;
+    }
+
+    div.innerHTML = `<div class="chat-avatar">🐱</div><div class="bubble-text">${formatted}${actionsHtml}</div>`;
+    chat.appendChild(div);
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showMimiTyping() {
+  const chat = document.getElementById('ai-chat');
+  const div = document.createElement('div');
+  div.className = 'chat-bubble';
+  div.id = 'mimi-typing';
+  div.innerHTML = `<div class="chat-avatar">🐱</div><div class="bubble-text"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeMimiTyping() {
+  const t = document.getElementById('mimi-typing');
+  if (t) t.remove();
+}
+
+function setMimiState(waiting) {
+  mimiWaiting = waiting;
+  const btn = document.getElementById('ai-send-btn');
+  if (btn) btn.disabled = waiting;
+  const statusEl = document.getElementById('ai-status-text');
+  if (statusEl) statusEl.textContent = waiting ? '● Mimi is thinking…' : '● Online · Powered by Claude';
+}
+
+async function sendMimiMsg() {
+  if (mimiWaiting) return;
   const input = document.getElementById('ai-input');
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
-  aiReply(msg);
+  await mimiSend(msg);
 }
 
-function aiReply(msg) {
-  if (aiWaiting) return;
+function sendSuggestion(btn) {
+  if (mimiWaiting) return;
+  const msg = btn.textContent.trim();
+  mimiSend(msg);
+}
+
+function topicPrompt(label) {
+  if (mimiWaiting) return;
+  // Highlight active pill
+  document.querySelectorAll('.ai-topic-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  const prompts = {
+    '🍽️ Order food': 'How do I order food on MimiFood?',
+    '📍 Find stalls': 'Which stalls are available and how do I find them?',
+    '🛒 My cart': 'How does the cart and checkout work?',
+    '📅 Schedule delivery': 'How do I schedule a delivery for a specific time?',
+    '👥 Group order': 'How do group orders work?',
+    '💳 Payment help': 'What payment methods are available and how do I pay?',
+    '📦 Track my order': 'How do I track my order after paying?',
+    '⭐ Favourites': 'How do I save and use favourite meals?',
+  };
+  const cleanLabel = label.replace(/^[^\s]+\s/, '') || label;
+  const question = Object.entries(prompts).find(([k]) => k.includes(cleanLabel.split(' ')[0]))?.[1]
+    || `Tell me about: ${label}`;
+  mimiSend(question);
+}
+
+async function mimiSend(userMsg) {
+  if (mimiWaiting) return;
+
+  // Show user bubble
+  appendMimiBubble(userMsg, true);
+  mimiHistory.push({ role: 'user', content: userMsg });
+
+  // Show typing
+  showMimiTyping();
+  setMimiState(true);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: MIMI_SYSTEM_PROMPT,
+        messages: mimiHistory
+      })
+    });
+
+    const data = await response.json();
+    removeMimiTyping();
+
+    if (data.content && data.content[0]) {
+      const reply = data.content[0].text;
+      mimiHistory.push({ role: 'assistant', content: reply });
+      appendMimiBubble(reply, false);
+    } else {
+      appendMimiBubble("Oops, I had a small hiccup! Try asking again 🐱", false);
+    }
+  } catch (err) {
+    removeMimiTyping();
+    appendMimiBubble("Hmm, I can't connect right now. Check your internet and try again! 📶", false);
+  }
+
+  setMimiState(false);
+  // Remove topic pill highlights after reply
+  setTimeout(() => document.querySelectorAll('.ai-topic-pill').forEach(p => p.classList.remove('active')), 300);
+}
+
+function handleMimiAction(action) {
+  if (action.startsWith('navigate-')) {
+    const target = action.replace('navigate-', '');
+    navigate(target);
+  } else if (action.startsWith('show-toast:')) {
+    showToast(action.replace('show-toast:', ''));
+  }
+}
+
+function clearMimiChat() {
   const chat = document.getElementById('ai-chat');
-
-  // User bubble
-  const userBubble = document.createElement('div');
-  userBubble.className = 'chat-bubble user';
-  userBubble.innerHTML = `<div class="chat-avatar user">M</div><div class="bubble-text">${msg}</div>`;
-  chat.appendChild(userBubble);
-
-  // Typing indicator
-  const typing = document.createElement('div');
-  typing.className = 'chat-bubble';
-  typing.id = 'typing-ind';
-  typing.innerHTML = `<div class="chat-avatar">🐱</div><div class="bubble-text"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
-  chat.appendChild(typing);
-  chat.scrollTop = chat.scrollHeight;
-  aiWaiting = true;
-
-  const responses = aiMessages[msg] || ["Hmm, let me think about that…", "Based on your schedule and break time, I'd recommend Nasi Ayam Goreng — fast, affordable, and arrives before your class! 🐱"];
-
-  let delay = 1200;
-  responses.forEach((r, i) => {
-    setTimeout(() => {
-      if (i === 0) {
-        const t = document.getElementById('typing-ind');
-        if (t) t.remove();
-      }
-      const bubble = document.createElement('div');
-      bubble.className = 'chat-bubble';
-      bubble.innerHTML = `<div class="chat-avatar">🐱</div><div class="bubble-text" style="white-space:pre-line">${r}</div>`;
-      chat.appendChild(bubble);
-      chat.scrollTop = chat.scrollHeight;
-
-      if (i === responses.length - 1) {
-        aiWaiting = false;
-        // Add order button if it's a recommendation
-        if (msg === 'RM10' || msg === 'Something fast') {
-          const btnBubble = document.createElement('div');
-          btnBubble.className = 'chat-bubble';
-          btnBubble.innerHTML = `<div class="chat-avatar">🐱</div><div><div class="bubble-text">Want me to add Nasi Ayam Goreng to your cart?</div><div style="display:flex;gap:8px;margin-top:8px"><button class="ai-quick-btn" onclick="aiAddToCart(this)">✅ Yes, order it!</button><button class="ai-quick-btn" onclick="aiReply('Show more options')">🔄 Show more</button></div></div>`;
-          chat.appendChild(btnBubble);
-          chat.scrollTop = chat.scrollHeight;
-        }
-      }
-    }, delay * (i + 1));
-  });
+  chat.innerHTML = '';
+  mimiHistory = [];
+  mimiGreeted = false;
+  mimiGreeting();
+  showToast('Chat cleared 🐱');
 }
 
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Init greeting when AI screen becomes active
+(function() {
+  const aiScreen = document.getElementById('screen-ai');
+  if (!aiScreen) return;
+  const obs = new MutationObserver(() => {
+    if (aiScreen.classList.contains('active') && !mimiGreeted) {
+      setTimeout(mimiGreeting, 200);
+    }
+  });
+  obs.observe(aiScreen, { attributes: true, attributeFilter: ['class'] });
+})();
+
+// Legacy stubs (keep these so other buttons that call the old functions still work)
+function sendAiMsg() { sendMimiMsg(); }
+function aiReply(msg) { mimiSend(msg); }
 function aiAddToCart(btn) {
-  btn.parentElement.querySelectorAll('.ai-quick-btn').forEach(b => b.disabled = true);
+  if (btn && btn.parentElement) btn.parentElement.querySelectorAll('.ai-quick-btn').forEach(b => b.disabled = true);
   showToast('🛒 Nasi Ayam Goreng added to cart!');
-  setTimeout(() => {
-    const chat = document.getElementById('ai-chat');
-    const b = document.createElement('div');
-    b.className = 'chat-bubble';
-    b.innerHTML = `<div class="chat-avatar">🐱</div><div class="bubble-text">Done! 🎉 Added to your cart. Your food will arrive at <strong>1:08 PM</strong> — 7 min before your break ends! Go to cart? <button class="ai-quick-btn" style="margin-top:8px;display:block" onclick="navigate('cart')">🛒 View Cart →</button></div>`;
-    chat.appendChild(b);
-    chat.scrollTop = chat.scrollHeight;
-  }, 600);
+  mimiSend('I added it to cart, what next?');
 }
 
 // ETA countdown animation
